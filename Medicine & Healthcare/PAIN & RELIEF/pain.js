@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ================
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
   let products = []; // Will be populated from backend
+  let allBrands = new Set();
 
   // ================
   // DOM Elements
@@ -12,7 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const categoryList = document.getElementById('categoryList');
   const brandList = document.getElementById('brandList');
   const brandToggle = (brandList && brandList.previousElementSibling) ? brandList.previousElementSibling.querySelector('span') : null;
-  const brandFilters = document.querySelectorAll('.brand-filter');
   const sortSelect = document.getElementById('sortSelect');
   const uploadModal = document.getElementById('uploadModal');
   const validPrescriptionModal = document.getElementById('validPrescriptionModal');
@@ -33,56 +33,68 @@ document.addEventListener('DOMContentLoaded', () => {
   // ================
   async function fetchProducts() {
     try {
-      const response = await fetch(`${API_BASE_URL}/get-all-products?page=0&size=100`);
-      if (!response.ok) throw new Error('Failed to fetch products');
+      showLoadingState();
+      const encodedSubCategory = encodeURIComponent('Pain Relief And Fever');
+      const response = await fetch(`${API_BASE_URL}/get-by-sub-category/${encodedSubCategory}`);
+      
+      if (!response.ok) throw new Error('Failed to fetch products by subcategory');
       
       const data = await response.json();
-      // Convert backend response to frontend format
-      products = data.content.map(product => ({
-        id: product.productId,
-        name: product.productName,
-        price: product.productPrice,
-        originalPrice: product.productOriginalPrice,
-        discount: product.productDiscount > 0 ? `${product.productDiscount}% off` : '',
-        category: product.productCategory,
-        brand: product.productBrand,
-        image: `${API_BASE_URL}/${product.productId}/image`,
-        prescriptionRequired: product.prescriptionRequired || false,
-        description: product.productDescription,
-        inStock: product.productStock > 0
-      }));
+      products = Array.isArray(data) ? data.map(product => transformProductData(product)) : [];
+      
+      // Extract unique brands for filtering
+      allBrands = new Set(products.map(p => p.brand).filter(Boolean));
+      updateBrandList();
       
       displayProducts(products);
       updateCategoryList();
-      updateBrandList();
     } catch (error) {
       console.error('Error fetching products:', error);
-      // Fallback to empty array if API fails
+      showErrorState('Failed to load Pain Relief And Fever products. Please try again later.');
       products = [];
       displayProducts(products);
     }
+  }
+
+  function transformProductData(backendProduct) {
+    return {
+      id: backendProduct.productId,
+      productId: backendProduct.productId,
+      name: backendProduct.productName,
+      productName: backendProduct.productName,
+      price: backendProduct.productPrice || backendProduct.price,
+      originalPrice: backendProduct.productOldPrice || backendProduct.mrp,
+      mrp: backendProduct.productOldPrice || backendProduct.mrp,
+      discount: calculateDiscount(backendProduct.productPrice, backendProduct.productOldPrice || backendProduct.mrp),
+      category: backendProduct.productCategory,
+      subCategory: backendProduct.productSubCategory,
+      brand: backendProduct.brandName || backendProduct.productBrand,
+      image: backendProduct.productMainImage
+        ? `${API_BASE_URL}/${backendProduct.productId}/image`
+        : 'https://via.placeholder.com/150?text=No+Image',
+      prescriptionRequired: backendProduct.prescriptionRequired || false,
+      description: backendProduct.productDescription,
+      inStock: (backendProduct.productQuantity && backendProduct.productQuantity > 0) || backendProduct.productStock === 'In-Stock',
+      productSubImages: backendProduct.productSubImages || [],
+      ...backendProduct
+    };
+  }
+
+  function calculateDiscount(currentPrice, originalPrice) {
+    if (!originalPrice || originalPrice <= currentPrice) return '';
+    const discountPercent = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
+    return `${discountPercent}% off`;
   }
 
   async function fetchProductsByCategory(category) {
     try {
       const encodedCategory = encodeURIComponent(category);
       const response = await fetch(`${API_BASE_URL}/get-by-category/${encodedCategory}`);
+      
       if (!response.ok) throw new Error('Failed to fetch products by category');
       
       const data = await response.json();
-      return data.map(product => ({
-        id: product.productId,
-        name: product.productName,
-        price: product.productPrice,
-        originalPrice: product.productOriginalPrice,
-        discount: product.productDiscount > 0 ? `${product.productDiscount}% off` : '',
-        category: product.productCategory,
-        brand: product.productBrand,
-        image: `${API_BASE_URL}/${product.productId}/image`,
-        prescriptionRequired: product.prescriptionRequired || false,
-        description: product.productDescription,
-        inStock: product.productStock > 0
-      }));
+      return data.map(product => transformProductData(product));
     } catch (error) {
       console.error('Error fetching products by category:', error);
       return [];
@@ -95,20 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!response.ok) throw new Error('Failed to fetch product details');
       
       const product = await response.json();
-      return {
-        id: product.productId,
-        name: product.productName,
-        price: product.productPrice,
-        originalPrice: product.productOriginalPrice,
-        discount: product.productDiscount > 0 ? `${product.productDiscount}% off` : '',
-        category: product.productCategory,
-        brand: product.productBrand,
-        image: `${API_BASE_URL}/${product.productId}/image`,
-        prescriptionRequired: product.prescriptionRequired || false,
-        description: product.productDescription,
-        inStock: product.productStock > 0,
-        productSubImages: product.productSubImages || []
-      };
+      return transformProductData(product);
     } catch (error) {
       console.error('Error fetching product details:', error);
       return null;
@@ -118,6 +117,28 @@ document.addEventListener('DOMContentLoaded', () => {
   // ================
   // Helpers
   // ================
+  function showLoadingState() {
+    if (!productGrid) return;
+    productGrid.innerHTML = `
+      <div class="col-span-full flex justify-center items-center py-8">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <span class="ml-3 text-gray-600">Loading Pain Relief And Fever products...</span>
+      </div>
+    `;
+  }
+
+  function showErrorState(message) {
+    if (!productGrid) return;
+    productGrid.innerHTML = `
+      <div class="col-span-full text-center py-8">
+        <p class="text-red-600 mb-4">${message}</p>
+        <button onclick="fetchProducts()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+          Retry
+        </button>
+      </div>
+    `;
+  }
+
   function updateCartCount() {
     if (!cartCountElement) return;
     const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
@@ -128,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateCategoryList() {
     if (!categoryList) return;
     
-    const categories = [...new Set(products.map(p => p.category))];
+    const categories = [...new Set(products.map(p => p.category).filter(Boolean))];
     categoryList.innerHTML = '';
     
     categories.forEach(category => {
@@ -147,22 +168,26 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateBrandList() {
     if (!brandList) return;
     
-    const brands = [...new Set(products.map(p => p.brand))];
-    brandList.innerHTML = '';
+    const brandFilterContainer = brandList.querySelector('.space-y-2') || document.createElement('div');
+    brandFilterContainer.className = 'space-y-2';
+    brandFilterContainer.innerHTML = '';
     
-    brands.forEach(brand => {
-      const li = document.createElement('li');
-      li.className = 'mb-2';
-      li.innerHTML = `
-        <label class="flex items-center">
-          <input type="checkbox" class="brand-filter mr-2" value="${escapeHtml(brand)}">
-          <span class="text-gray-700">${escapeHtml(brand)}</span>
-        </label>
-      `;
-      brandList.appendChild(li);
+    allBrands.forEach(brand => {
+      if (brand) {
+        const label = document.createElement('label');
+        label.className = 'flex items-center space-x-2';
+        label.innerHTML = `
+          <input type="checkbox" class="brand-filter rounded text-blue-600" value="${escapeHtml(brand)}">
+          <span class="text-sm text-gray-700">${escapeHtml(brand)}</span>
+        `;
+        brandFilterContainer.appendChild(label);
+      }
     });
     
-    // Re-attach event listeners to new brand filters
+    if (!brandList.querySelector('.space-y-2')) {
+      brandList.appendChild(brandFilterContainer);
+    }
+    
     document.querySelectorAll('.brand-filter').forEach(filter => {
       filter.addEventListener('change', () => {
         applyFilters(products);
@@ -216,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
     productDiv.innerHTML = `
       ${prescriptionBadge}
       ${outOfStockBadge}
-      <img src="${product.image}" alt="${escapeHtml(product.name)}" class="product-image w-full h-32 object-cover rounded-lg mb-3">
+      <img src="${product.image}" alt="${escapeHtml(product.name)}" class="product-image w-full h-32 object-cover rounded-lg mb-3" onerror="this.src='https://via.placeholder.com/150?text=Image+Error'">
       <p class="text-sm text-gray-600 font-medium">${escapeHtml(product.name)}</p>
       <p class="text-xs text-gray-500">${escapeHtml(product.brand)}</p>
       ${product.prescriptionRequired ? '<p class="text-red-600 text-xs mt-1 font-semibold">⚠️ Prescription needed</p>' : ''}
@@ -246,8 +271,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (list.length === 0) {
       productGrid.innerHTML = `
         <div class="col-span-full text-center py-8">
-          <p class="text-gray-500 text-lg">No products found</p>
-          <p class="text-gray-400 text-sm">Try adjusting your filters</p>
+          <p class="text-gray-500 text-lg">No Pain Relief And Fever products found</p>
+          <p class="text-gray-400 text-sm">Try checking back later or browse other categories</p>
         </div>
       `;
       return;
@@ -268,7 +293,6 @@ document.addEventListener('DOMContentLoaded', () => {
   async function addToCartById(productId) {
     const product = products.find(p => p.id == productId);
     if (!product) {
-      // If product not in current list, fetch from backend
       const productDetails = await fetchProductDetails(productId);
       if (!productDetails) {
         alert('Product not found');
@@ -308,7 +332,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Category & Brand Filters
   // ================
   categoryList?.addEventListener('click', async (e) => {
-    // expand toggle
     if (e.target.classList.contains('expand-toggle')) {
       const li = e.target.parentElement.parentElement;
       const subcategory = li.querySelector('.subcategory');
@@ -319,18 +342,17 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // filter by category link
     if (e.target.classList.contains('category-link')) {
       e.preventDefault();
       const category = e.target.textContent.trim();
       activeCategory = category;
       
+      showLoadingState();
       const filteredProducts = await fetchProductsByCategory(category);
       applyFilters(filteredProducts);
     }
   });
 
-  // brand toggle (expand/collapse)
   if (brandToggle) {
     brandToggle.addEventListener('click', () => {
       brandList.classList.toggle('hidden');
@@ -338,23 +360,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // sorting
   sortSelect?.addEventListener('change', () => {
     activeSort = sortSelect.value;
     applyFilters(activeCategory ? products.filter(p => p.category === activeCategory) : products);
   });
 
-  // Apply filters
   function applyFilters(list) {
     let filteredList = [...list];
 
-    // brand filters
     const selectedBrands = Array.from(document.querySelectorAll('.brand-filter:checked')).map(f => f.value);
     if (selectedBrands.length > 0) {
       filteredList = filteredList.filter(p => selectedBrands.includes(p.brand));
     }
 
-    // sorting
     if (activeSort === 'Price: Low to High') {
       filteredList.sort((a, b) => a.price - b.price);
     } else if (activeSort === 'Price: High to Low') {
@@ -594,4 +612,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.addToCart = addToCartById;
 });
-

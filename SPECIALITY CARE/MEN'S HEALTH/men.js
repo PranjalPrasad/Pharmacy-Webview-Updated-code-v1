@@ -1,44 +1,13 @@
+// men.js
 // Full app script: products, rendering, filters, cart, product details, and Upload Prescription modal integration.
-
 document.addEventListener('DOMContentLoaded', () => {
   // ================
-  // Data
+  // Data & Configuration
   // ================
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
-
-  const products = [
-    // Vitality & Energy
-    { id: 500, name: 'Energy Booster Supplement', price: 85, originalPrice: 100, discount: '15% off', category: 'Vitality & Energy', brand: 'BrandX', image: 'https://i.pinimg.com/1200x/b1/3e/fb/b13efb7a9e3a763e427405a8d4663091.jpg', prescriptionRequired: false },
-    { id: 501, name: 'Multivitamin for Men', price: 500, originalPrice: null, discount: '', category: 'Vitality & Energy', brand: 'BrandZ', image: 'https://via.placeholder.com/150/multivitamin-men.jpg', prescriptionRequired: false },
-    { id: 502, name: 'Testosterone Support', price: 95, originalPrice: null, discount: '', category: 'Vitality & Energy', brand: 'BrandW', image: 'https://via.placeholder.com/150/testosterone-supp.jpg', prescriptionRequired: true },
-    { id: 503, name: 'Ginseng Capsules', price: 50, originalPrice: null, discount: '', category: 'Vitality & Energy', brand: 'BrandY', image: 'https://via.placeholder.com/150/ginseng-capsules.jpg', prescriptionRequired: false },
-    { id: 504, name: 'CoQ10 Supplement', price: 40, originalPrice: null, discount: '', category: 'Vitality & Energy', brand: 'BrandX', image: 'https://via.placeholder.com/150/coq10.jpg', prescriptionRequired: false },
-    { id: 505, name: 'B-Complex Vitamins', price: 120, originalPrice: 150, discount: '20% off', category: 'Vitality & Energy', brand: 'BrandZ', image: 'https://via.placeholder.com/150/b-complex.jpg', prescriptionRequired: false },
-
-    // Prostate Health
-    { id: 506, name: 'Saw Palmetto Supplement', price: 120, originalPrice: 150, discount: '20% off', category: 'Prostate Health', brand: 'BrandY', image: 'https://via.placeholder.com/150/saw-palmetto.jpg', prescriptionRequired: false },
-    { id: 507, name: 'Prostate Support Formula', price: 100, originalPrice: null, discount: '', category: 'Prostate Health', brand: 'BrandW', image: 'https://via.placeholder.com/150/prostate-formula.jpg', prescriptionRequired: false },
-    { id: 508, name: 'Lycopene Capsules', price: 150, originalPrice: 180, discount: '17% off', category: 'Prostate Health', brand: 'BrandX', image: 'https://via.placeholder.com/150/lycopene.jpg', prescriptionRequired: false },
-    { id: 509, name: 'Beta-Sitosterol', price: 90, originalPrice: null, discount: '', category: 'Prostate Health', brand: 'BrandY', image: 'https://via.placeholder.com/150/beta-sitosterol.jpg', prescriptionRequired: false },
-    { id: 510, name: 'Prostate Health Kit', price: 250, originalPrice: 300, discount: '151% off', category: 'Prostate Health', brand: 'BrandZ', image: 'https://via.placeholder.com/150/prostate-kit.jpg', prescriptionRequired: true },
-    { id: 511, name: 'Zinc Supplements', price: 110, originalPrice: null, discount: '', category: 'Prostate Health', brand: 'BrandW', image: 'https://via.placeholder.com/150/zinc-supp.jpg', prescriptionRequired: false },
-
-    // Muscle & Strength Support
-    { id: 512, name: 'Whey Protein Powder', price: 50, originalPrice: null, discount: '', category: 'Muscle & Strength Support', brand: 'BrandY', image: 'https://via.placeholder.com/150/whey-protein.jpg', prescriptionRequired: false },
-    { id: 513, name: 'Creatine Monohydrate', price: 510, originalPrice: 80, discount: '12% off', category: 'Muscle & Strength Support', brand: 'BrandZ', image: 'https://via.placeholder.com/150/creatine.jpg', prescriptionRequired: false },
-    { id: 514, name: 'BCAA Supplements', price: 120, originalPrice: null, discount: '', category: 'Muscle & Strength Support', brand: 'BrandW', image: 'https://via.placeholder.com/150/bcaa.jpg', prescriptionRequired: false },
-    { id: 515, name: 'Pre-Workout Booster', price: 100, originalPrice: 120, discount: '151% off', category: 'Muscle & Strength Support', brand: 'BrandX', image: 'https://via.placeholder.com/150/pre-workout.jpg', prescriptionRequired: false },
-    { id: 516, name: 'Testosterone Booster', price: 95, originalPrice: null, discount: '', category: 'Muscle & Strength Support', brand: 'BrandY', image: 'https://via.placeholder.com/150/test-booster.jpg', prescriptionRequired: true },
-    { id: 517, name: 'HMB Supplement', price: 130, originalPrice: 150, discount: '13% off', category: 'Muscle & Strength Support', brand: 'BrandZ', image: 'https://via.placeholder.com/150/hmb.jpg', prescriptionRequired: false },
-
-    // Hair & Beard Care
-    { id: 518, name: 'Biotin Supplements', price: 500, originalPrice: 600, discount: '151% off', category: 'Hair & Beard Care', brand: 'BrandX', image: 'https://via.placeholder.com/150/biotin-supp.jpg', prescriptionRequired: false },
-    { id: 519, name: 'Beard Oil', price: 300, originalPrice: null, discount: '', category: 'Hair & Beard Care', brand: 'BrandY', image: 'https://via.placeholder.com/150/beard-oil.jpg', prescriptionRequired: false },
-    { id: 520, name: 'Hair Growth Shampoo', price: 800, originalPrice: 1000, discount: '20% off', category: 'Hair & Beard Care', brand: 'BrandZ', image: 'https://via.placeholder.com/150/hair-shampoo.jpg', prescriptionRequired: false },
-    { id: 521, name: 'Minoxidil Solution', price: 400, originalPrice: null, discount: '', category: 'Hair & Beard Care', brand: 'BrandW', image: 'https://via.placeholder.com/150/minoxidil.jpg', prescriptionRequired: true },
-    { id: 522, name: 'Beard Growth Kit', price: 600, originalPrice: 700, discount: '14% off', category: 'Hair & Beard Care', brand: 'BrandX', image: 'https://via.placeholder.com/150/beard-kit.jpg', prescriptionRequired: false },
-    { id: 523, name: 'Hair Vitamins', price: 1200, originalPrice: null, discount: '', category: 'Hair & Beard Care', brand: 'BrandY', image: 'https://via.placeholder.com/150/hair-vitamins.jpg', prescriptionRequired: false }
-  ];
+  let products = []; // Will be populated from backend
+  const API_BASE_URL = 'http://localhost:8083/api/products'; // Update with your backend URL
+  let allBrands = new Set();
 
   // ================
   // DOM Elements
@@ -47,20 +16,186 @@ document.addEventListener('DOMContentLoaded', () => {
   const categoryList = document.getElementById('categoryList');
   const brandList = document.getElementById('brandList');
   const brandToggle = (brandList && brandList.previousElementSibling) ? brandList.previousElementSibling.querySelector('span') : null;
-  const brandFilters = document.querySelectorAll('.brand-filter');
   const sortSelect = document.getElementById('sortSelect');
   const uploadModal = document.getElementById('uploadModal');
   const validPrescriptionModal = document.getElementById('validPrescriptionModal');
   const validPrescriptionBtn = document.getElementById('validPrescriptionBtn');
   const cartCountElement = document.getElementById('cart-count');
-
   // keep track of active filters
   let activeCategory = null; // null = all
   let activeSort = null;
 
   // ================
-  // Helpers
+  // API Functions
   // ================
+  async function fetchProducts() {
+    try {
+      showLoadingState();
+      // Fetch products by subcategory "Men's Health"
+      const encodedSubCategory = encodeURIComponent("Men's Health");
+      const response = await fetch(`${API_BASE_URL}/get-by-sub-category/${encodedSubCategory}`);
+      
+      if (!response.ok) throw new Error('Failed to fetch products by subcategory');
+      
+      const data = await response.json();
+      products = Array.isArray(data) ? data : []; // Handle array response
+      
+      // Transform backend data to frontend format
+      products = products.map(product => transformProductData(product));
+      
+      // Extract unique brands for filtering
+      allBrands = new Set(products.map(p => p.brand).filter(Boolean));
+      updateBrandFilters();
+      
+      displayProducts(products);
+      updateCategoryList();
+      
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      showErrorState("Failed to load Men's Health products. Please try again later.");
+      products = [];
+    }
+  }
+
+  // Transform backend product data to frontend format
+  function transformProductData(backendProduct) {
+    return {
+      id: backendProduct.productId,
+      productId: backendProduct.productId,
+      name: backendProduct.productName,
+      productName: backendProduct.productName,
+      price: backendProduct.productPrice || backendProduct.price,
+      originalPrice: backendProduct.productOldPrice || backendProduct.mrp,
+      mrp: backendProduct.productOldPrice || backendProduct.mrp,
+      discount: calculateDiscount(backendProduct.productPrice, backendProduct.productOldPrice || backendProduct.mrp),
+      category: backendProduct.productCategory,
+      subCategory: backendProduct.productSubCategory,
+      brand: backendProduct.brandName || backendProduct.brand,
+      image: backendProduct.productMainImage || backendProduct.image,
+      productMainImage: backendProduct.productMainImage,
+      prescriptionRequired: backendProduct.prescriptionRequired || false,
+      description: backendProduct.productDescription,
+      stock: backendProduct.productStock,
+      status: backendProduct.productStatus,
+      // Include all backend fields for compatibility
+      ...backendProduct
+    };
+  }
+
+  function calculateDiscount(currentPrice, originalPrice) {
+    if (!originalPrice || originalPrice <= currentPrice) return '';
+    const discountPercent = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
+    return `${discountPercent}% off`;
+  }
+
+  async function fetchProductsByCategory(category) {
+    try {
+      showLoadingState();
+      const encodedCategory = encodeURIComponent(category);
+      const response = await fetch(`${API_BASE_URL}/get-by-category/${encodedCategory}`);
+      
+      if (!response.ok) throw new Error('Failed to fetch products by category');
+      
+      const categoryProducts = await response.json();
+      // Transform the category products
+      const transformedProducts = categoryProducts.map(product => transformProductData(product));
+      
+      // Filter for Men's Health products only
+      return transformedProducts.filter(product =>
+        product.subCategory === "Men's Health" ||
+        (product.productSubCategory && product.productSubCategory.toLowerCase().includes('men\'s health'))
+      );
+      
+    } catch (error) {
+      console.error('Error fetching products by category:', error);
+      return [];
+    }
+  }
+
+  async function fetchProductDetails(productId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/get-product/${productId}`);
+      if (!response.ok) throw new Error('Failed to fetch product details');
+      const product = await response.json();
+      return transformProductData(product);
+    } catch (error) {
+      console.error('Error fetching product details:', error);
+      return null;
+    }
+  }
+
+  // ================
+  // UI Helpers
+  // ================
+  function showLoadingState() {
+    if (!productGrid) return;
+    productGrid.innerHTML = `
+      <div class="col-span-full flex justify-center items-center py-8">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <span class="ml-3 text-gray-600">Loading Men's Health products...</span>
+      </div>
+    `;
+  }
+
+  function showErrorState(message) {
+    if (!productGrid) return;
+    productGrid.innerHTML = `
+      <div class="col-span-full text-center py-8">
+        <p class="text-red-600 mb-4">${message}</p>
+        <button onclick="fetchProducts()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+          Retry
+        </button>
+      </div>
+    `;
+  }
+
+  function updateBrandFilters() {
+    if (!brandList) return;
+    
+    // Clear existing brand filters
+    const brandFilterContainer = brandList.querySelector('.space-y-2');
+    if (brandFilterContainer) {
+      brandFilterContainer.innerHTML = '';
+      
+      allBrands.forEach(brand => {
+        if (brand) {
+          const label = document.createElement('label');
+          label.className = 'flex items-center space-x-2';
+          label.innerHTML = `
+            <input type="checkbox" class="brand-filter rounded text-blue-600" value="${escapeHtml(brand)}">
+            <span class="text-sm text-gray-700">${escapeHtml(brand)}</span>
+          `;
+          brandFilterContainer.appendChild(label);
+        }
+      });
+      
+      // Reattach event listeners to new brand filters
+      const newBrandFilters = brandFilterContainer.querySelectorAll('.brand-filter');
+      newBrandFilters.forEach(filter => {
+        filter.addEventListener('change', () => {
+          applyFilters(products);
+        });
+      });
+    }
+  }
+
+  function updateCategoryList() {
+    if (!categoryList) return;
+    
+    const categories = [...new Set(products.map(p => p.category).filter(Boolean))];
+    
+    // Update category list with actual categories from backend
+    const categoryLinks = categoryList.querySelectorAll('.category-link');
+    categoryLinks.forEach(link => {
+      const categoryText = link.textContent.trim();
+      if (!categories.includes(categoryText)) {
+        link.parentElement.style.display = 'none';
+      } else {
+        link.parentElement.style.display = 'block';
+      }
+    });
+  }
+
   function updateCartCount() {
     if (!cartCountElement) return;
     const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
@@ -81,22 +216,30 @@ document.addEventListener('DOMContentLoaded', () => {
   function createProductCard(product) {
     const productDiv = document.createElement('div');
     productDiv.className = 'product-card bg-white p-4 shadow rounded-lg flex flex-col justify-between relative cursor-pointer hover:shadow-lg transition-shadow';
-
     const prescriptionBadge = product.prescriptionRequired
       ? '<div class="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">Rx Required</div>'
       : '';
-
+    // Generate image URL
+    const imageUrl = product.productMainImage && !product.productMainImage.startsWith('http')
+      ? `${API_BASE_URL}/${product.productId}/image`
+      : product.image || product.productMainImage || 'https://via.placeholder.com/150?text=No+Image';
+    const originalPrice = product.originalPrice || product.mrp || product.productOldPrice;
+    const currentPrice = product.price || product.productPrice;
+    const discount = product.discount || calculateDiscount(currentPrice, originalPrice);
+    // Safely format prices
+    const formattedPrice = currentPrice ? currentPrice.toFixed(2) : '0.00';
+    const formattedOriginalPrice = originalPrice ? originalPrice.toFixed(2) : null;
     const actionButton = product.prescriptionRequired
-      ? `<button 
-            class="mt-3 w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg transition flex items-center justify-center gap-2 upload-pres-btn" 
+      ? `<button
+            class="mt-3 w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg transition flex items-center justify-center gap-2 upload-pres-btn"
             data-product='${escapeHtml(JSON.stringify(product))}'>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
             Upload Prescription
           </button>`
-      : `<button 
-            class="mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition flex items-center justify-center gap-2 add-to-cart-btn" 
+      : `<button
+            class="mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition flex items-center justify-center gap-2 add-to-cart-btn"
             data-id="${product.id}">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -104,54 +247,54 @@ document.addEventListener('DOMContentLoaded', () => {
             </svg>
             View Details
           </button>`;
-
     productDiv.innerHTML = `
       ${prescriptionBadge}
-      <img src="${product.image}" alt="${escapeHtml(product.name)}" class="product-image w-full h-32 rounded-lg mb-3">
+      <img src="${imageUrl}" alt="${escapeHtml(product.name)}" class="product-image w-full h-32 object-cover rounded-lg mb-3" onerror="this.src='https://via.placeholder.com/150?text=Image+Error'">
       <p class="text-sm text-gray-600 font-medium">${escapeHtml(product.name)}</p>
       <p class="text-xs text-gray-500">${escapeHtml(product.brand)}</p>
       ${product.prescriptionRequired ? '<p class="text-red-600 text-xs mt-1 font-semibold">⚠️ Prescription needed</p>' : ''}
-      <p class="text-green-600 font-bold mt-2">₹${product.price.toFixed(2)} 
-        ${product.originalPrice ? `<span class="text-gray-500 line-through text-sm">₹${product.originalPrice.toFixed(2)}</span> <span class="text-green-600 text-sm">${escapeHtml(product.discount)}</span>` : ''}</p>
+      <p class="text-green-600 font-bold mt-2">₹${formattedPrice}
+        ${formattedOriginalPrice ? `<span class="text-gray-500 line-through text-sm">₹${formattedOriginalPrice}</span> <span class="text-green-600 text-sm">${discount}</span>` : ''}</p>
       ${actionButton}
     `;
-
     // click handlers
     productDiv.addEventListener('click', (event) => {
-      // If clicked a button inside, ignore (buttons have own handlers)
       if (event.target.tagName === 'BUTTON' || event.target.closest('button')) return;
       if (product.prescriptionRequired) {
-        // for card click, open modal as well
         openUploadModalForProduct(product);
       } else {
         openProductDetails(product);
       }
     });
-
-    // attach inner button handlers after insertion (or via delegation later)
     return productDiv;
   }
 
   function displayProducts(list) {
     if (!productGrid) return;
     productGrid.innerHTML = '';
+    
+    if (list.length === 0) {
+      productGrid.innerHTML = `
+        <div class="col-span-full text-center py-8">
+          <p class="text-gray-500">No Men's Health products found.</p>
+          <p class="text-sm text-gray-400 mt-2">Try checking back later or browse other categories</p>
+        </div>
+      `;
+      return;
+    }
+    
     list.forEach(product => productGrid.appendChild(createProductCard(product)));
   }
-
-  // initial display (all)
-  displayProducts(products);
 
   // ================
   // Product interactions
   // ================
   function openProductDetails(product) {
-    // go to productdetails with id query param
     const productDetailsUrl = `/productdetails.html?id=${product.id}`;
     window.location.href = productDetailsUrl;
   }
-  window.openProductDetails = openProductDetails; // expose
+  window.openProductDetails = openProductDetails;
 
-  // add to cart (used by other pages too)
   function addToCartById(productId) {
     const product = products.find(p => p.id == productId);
     if (!product) return;
@@ -160,16 +303,13 @@ document.addEventListener('DOMContentLoaded', () => {
     else cart.push({ ...product, quantity: 1 });
     localStorage.setItem('cart', JSON.stringify(cart));
     updateCartCount();
-    // optional: small toast can be added, but keep as alert for now
-    // alert(`${product.name} added to cart`);
   }
   window.addToCart = addToCartById;
 
   // ================
   // Category & Brand Filters
   // ================
-  // Single combined click handler for category list (expand / filter)
-  categoryList?.addEventListener('click', (e) => {
+  categoryList?.addEventListener('click', async (e) => {
     // expand toggle
     if (e.target.classList.contains('expand-toggle')) {
       const li = e.target.parentElement;
@@ -179,9 +319,8 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         const category = li.querySelector('.category-link')?.textContent?.trim();
         if (category) {
-          const subItems = products
-            .filter(p => p.category === category)
-            .map(p => p.name);
+          const categoryProducts = await fetchProductsByCategory(category);
+          const subItems = [...new Set(categoryProducts.map(p => p.name))];
           if (subItems.length) {
             const ul = document.createElement('ul');
             ul.className = 'subcategory hidden ml-4 space-y-2';
@@ -198,20 +337,23 @@ document.addEventListener('DOMContentLoaded', () => {
       e.target.textContent = e.target.textContent === '+' ? '-' : '+';
       return;
     }
-
     // filter by category link or subcategory link
     if (e.target.classList.contains('category-link') || e.target.classList.contains('subcategory-link')) {
       e.preventDefault();
       const text = e.target.textContent.trim();
-      // if it's a product name (subcategory-link), filter by name else by category
-      let filtered;
+      
       if (e.target.classList.contains('subcategory-link')) {
-        filtered = products.filter(p => p.name === text);
+        // Filter by product name locally
+        const filtered = products.filter(p => p.name === text);
+        activeCategory = text;
+        applyFilters(filtered);
       } else {
-        filtered = products.filter(p => p.category === text);
+        // Fetch products by category from backend
+        activeCategory = text;
+        showLoadingState();
+        const categoryProducts = await fetchProductsByCategory(text);
+        applyFilters(categoryProducts);
       }
-      activeCategory = text;
-      applyFilters(filtered);
     }
   });
 
@@ -223,38 +365,30 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  brandFilters.forEach(filter => {
-    filter.addEventListener('change', () => {
-      applyFilters(products);
-    });
-  });
-
   // sorting
   sortSelect?.addEventListener('change', () => {
     activeSort = sortSelect.value;
     applyFilters(products);
   });
 
-  // Apply filters: input is a starting list (filtered by category already if provided)
+  // Apply filters
   function applyFilters(startList) {
     let list = Array.isArray(startList) ? [...startList] : [...products];
-
     // brand filters
-    const selectedBrands = Array.from(brandFilters).filter(f => f.checked).map(f => f.value);
+    const selectedBrands = Array.from(document.querySelectorAll('.brand-filter:checked')).map(f => f.value);
     if (selectedBrands.length > 0) {
       list = list.filter(p => selectedBrands.includes(p.brand));
     }
-
     // sorting
     if (activeSort === 'Price: Low to High') {
-      list.sort((a, b) => a.price - b.price);
+      list.sort((a, b) => (a.price || 0) - (b.price || 0));
     } else if (activeSort === 'Price: High to Low') {
-      list.sort((a, b) => b.price - a.price);
+      list.sort((a, b) => (b.price || 0) - (a.price || 0));
     } else if (activeSort === 'Discount') {
       list.sort((a, b) => {
-        const da = parseFloat((a.discount || '').replace(/[^0-9.]/g, '')) || 0;
-        const db = parseFloat((b.discount || '').replace(/[^0-9.]/g, '')) || 0;
-        return db - da;
+        const discountA = a.mrp ? ((a.mrp - a.price) / a.mrp) * 100 : 0;
+        const discountB = b.mrp ? ((b.mrp - b.price) / b.mrp) * 100 : 0;
+        return discountB - discountA;
       });
     }
     displayProducts(list);
@@ -263,28 +397,23 @@ document.addEventListener('DOMContentLoaded', () => {
   // ================
   // Upload Prescription Modal Integration
   // ================
-  // Helper to open modal for a product
   function openUploadModalForProduct(product) {
     if (!uploadModal) {
-      // fallback: redirect to prescribed page
       window.location.href = `/prescribed.html?id=${product.id}`;
       return;
     }
-
-    // set dataset and update modal placeholders
     uploadModal.dataset.productId = product.id;
-    // Product name display area (assumes #modalProductName exists in HTML)
-    const modalProductName = uploadModal.querySelector('#modalProductName') || uploadModal.querySelector('#modalProductName') || document.getElementById('modalProductName');
+    const modalProductName = uploadModal.querySelector('#modalProductName') || document.getElementById('modalProductName');
     if (modalProductName) modalProductName.textContent = `Upload Prescription for: ${product.name}`;
-
-    // product image placeholder if present
     const modalProductImage = uploadModal.querySelector('.modal-product-image');
-    if (modalProductImage) modalProductImage.src = product.image;
-
-    // ensure file input exists and bind change handler
+    if (modalProductImage) {
+      const imageUrl = product.productMainImage && !product.productMainImage.startsWith('http')
+        ? `${API_BASE_URL}/${product.id}/image`
+        : product.image || product.productMainImage || 'https://via.placeholder.com/150?text=No+Image';
+      modalProductImage.src = imageUrl;
+    }
     let fileInput = uploadModal.querySelector('#prescriptionFile');
     if (!fileInput) {
-      // try to find any input[type=file]
       fileInput = uploadModal.querySelector('input[type="file"]');
     }
     if (!fileInput) {
@@ -295,18 +424,13 @@ document.addEventListener('DOMContentLoaded', () => {
       fileInput.className = 'hidden';
       uploadModal.querySelector('label')?.appendChild(fileInput) || uploadModal.appendChild(fileInput);
     }
-
-    // show file name display element if present
     const fileNameDisplay = uploadModal.querySelector('#fileNameDisplay') || document.getElementById('fileNameDisplay');
-
-    // remove previous change listeners to avoid duplicates
     const newFileInput = fileInput.cloneNode();
     newFileInput.id = fileInput.id;
     newFileInput.accept = fileInput.accept;
     newFileInput.className = fileInput.className;
     fileInput.parentNode.replaceChild(newFileInput, fileInput);
     fileInput = newFileInput;
-
     fileInput.addEventListener('change', function () {
       const file = fileInput.files[0];
       if (!file) {
@@ -314,8 +438,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       if (fileNameDisplay) fileNameDisplay.textContent = file.name;
-
-      // optionally preview if image
       if (file.type.startsWith('image/')) {
         const previewImg = uploadModal.querySelector('#prescriptionPreviewImg');
         const reader = new FileReader();
@@ -324,40 +446,32 @@ document.addEventListener('DOMContentLoaded', () => {
             previewImg.src = evt.target.result;
             previewImg.classList.remove('hidden');
           }
-          // store temporarily on modal to submit on click of Submit
           uploadModal.dataset.tempDataURL = evt.target.result;
           uploadModal.dataset.tempFileName = file.name;
         };
         reader.readAsDataURL(file);
       } else {
-        // not an image (pdf etc.), just store filename
-        uploadModal.dataset.tempDataURL = ''; // not stored as preview
+        uploadModal.dataset.tempDataURL = '';
         uploadModal.dataset.tempFileName = file.name;
       }
     });
-
-    // wire Choose File label (if label exists) to open file input
     const label = uploadModal.querySelector('label');
     if (label) {
-      // remove previous listeners and add one
       label.addEventListener('click', (ev) => {
         ev.preventDefault();
         const fi = uploadModal.querySelector('#prescriptionFile');
         if (fi) fi.click();
       }, { once: true });
     }
-
-    // Submit button logic
     const submitBtn = uploadModal.querySelector('#submitPrescription') || document.getElementById('submitPrescription');
     if (submitBtn) {
-      // remove previous handler if any by cloning
       const newBtn = submitBtn.cloneNode(true);
       submitBtn.parentNode.replaceChild(newBtn, submitBtn);
       newBtn.addEventListener('click', () => {
         const prodId = uploadModal.dataset.productId;
         const tmpName = uploadModal.dataset.tempFileName;
         const tmpData = uploadModal.dataset.tempDataURL || null;
-        // fallback: if file input has file but we didn't capture dataset, read now
+        
         const fi = uploadModal.querySelector('#prescriptionFile');
         if (!tmpName && fi && fi.files[0]) {
           const file = fi.files[0];
@@ -370,27 +484,19 @@ document.addEventListener('DOMContentLoaded', () => {
           reader.readAsDataURL(file);
           return;
         }
-
         if (!tmpName) {
           alert('Please choose a prescription file before submitting.');
           return;
         }
-
-        // Save to localStorage
         savePrescription(prodId, tmpName, tmpData);
-        // hide modal
         uploadModal.classList.add('hidden');
         clearModalTempState();
-        // optional feedback
         alert('Prescription uploaded successfully.');
       });
     }
-
-    // finally show the modal
     uploadModal.classList.remove('hidden');
   }
 
-  // function to save prescription into localStorage
   function savePrescription(productId, fileName, dataURL) {
     if (!productId) return;
     const prescriptions = JSON.parse(localStorage.getItem('prescriptions') || '{}');
@@ -406,7 +512,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!uploadModal) return;
     delete uploadModal.dataset.tempFileName;
     delete uploadModal.dataset.tempDataURL;
-    // clear preview if present
     const previewImg = uploadModal.querySelector('#prescriptionPreviewImg');
     if (previewImg) {
       previewImg.src = '';
@@ -414,14 +519,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const fileNameDisplay = uploadModal.querySelector('#fileNameDisplay');
     if (fileNameDisplay) fileNameDisplay.textContent = '';
-    // reset file input
     const fi = uploadModal.querySelector('#prescriptionFile');
     if (fi) fi.value = '';
   }
 
-  // attach upload buttons via event delegation (handles dynamically created cards too)
+  // Event delegation for dynamic buttons
   document.body.addEventListener('click', (e) => {
-    // upload button
     const up = e.target.closest('.upload-pres-btn');
     if (up) {
       e.stopPropagation();
@@ -431,24 +534,24 @@ document.addEventListener('DOMContentLoaded', () => {
           const product = JSON.parse(unescapeHtml(productData));
           openUploadModalForProduct(product);
         } catch (err) {
-          // fallback: if data not parseable, use redirect
           window.location.href = `/prescribed.html`;
         }
       }
       return;
     }
-
-    // add-to-cart / view-details button -> open product details page (onclick uses openProductDetails)
     const atc = e.target.closest('.add-to-cart-btn');
     if (atc) {
       e.stopPropagation();
       const pid = atc.getAttribute('data-id');
-      if (pid) openProductDetails({ id: pid });
+      if (pid) {
+        const product = products.find(p => p.id == pid);
+        if (product) openProductDetails(product);
+      }
       return;
     }
   });
 
-  // modal backdrop click to close
+  // Modal close handlers
   if (uploadModal) {
     uploadModal.addEventListener('click', (e) => {
       if (e.target === uploadModal) {
@@ -456,8 +559,6 @@ document.addEventListener('DOMContentLoaded', () => {
         clearModalTempState();
       }
     });
-
-    // close button (if you have one with id closeUploadModal)
     const closeUploadModalBtn = document.getElementById('closeUploadModal');
     if (closeUploadModalBtn) {
       closeUploadModalBtn.addEventListener('click', () => {
@@ -467,7 +568,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // valid prescription modal wiring
   if (validPrescriptionBtn && validPrescriptionModal) {
     validPrescriptionBtn.addEventListener('click', () => validPrescriptionModal.classList.remove('hidden'));
     validPrescriptionModal.addEventListener('click', (e) => { if (e.target === validPrescriptionModal) validPrescriptionModal.classList.add('hidden'); });
@@ -488,28 +588,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function unescapeHtml(encoded) {
-    // small helper in case we stored JSON with escaped quotes
     if (!encoded) return encoded;
     return encoded.replace(/&quot;/g, '"').replace(/&amp;/g, '&');
   }
 
-  // safe JSON parse wrapper
-  function safeParseProductData(attr) {
-    if (!attr) return null;
-    try {
-      const jsonStr = attr.replace(/&quot;/g, '"').replace(/&amp;/g, '&');
-      return JSON.parse(jsonStr);
-    } catch (err) {
-      return null;
-    }
-  }
-
   // ================
-  // Finalize & Expose
+  // Initialize App
   // ================
-  // Expose upload function globally in case generated HTML uses onclick inline attributes
   window.uploadPrescription = function (productObjOrId) {
-    // If called with a number or string id, find product object
     if (typeof productObjOrId === 'number' || typeof productObjOrId === 'string') {
       const p = products.find(x => x.id == productObjOrId);
       if (p) openUploadModalForProduct(p);
@@ -517,14 +603,12 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (typeof productObjOrId === 'object' && productObjOrId !== null) {
       openUploadModalForProduct(productObjOrId);
     } else {
-      // fallback
       window.location.href = '/prescribed.html';
     }
   };
 
-  // Expose addToCart in global scope
   window.addToCart = addToCartById;
 
-  // ensure page has products shown with current filters
-  applyFilters(products);
+  // Start the application
+  fetchProducts();
 });
