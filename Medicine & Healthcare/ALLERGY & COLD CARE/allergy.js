@@ -3,44 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Data
   // ================
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
-
-  const products = [
-    // Anti-Allergy / Antihistamines
-    { id: 120, name: 'Loratadine Tablets', price: 100, originalPrice: 120, discount: '17% off', category: 'Anti-Allergy / Antihistamines', brand: 'BrandX', image: 'https://i.pinimg.com/1200x/4d/0c/dd/4d0cdde377dea773bddbaf5310e6aefc.jpg', prescriptionRequired: false },
-    { id: 121, name: 'Cetirizine Syrup', price: 80, originalPrice: null, discount: '', category: 'Anti-Allergy / Antihistamines', brand: 'BrandY', image: 'https://i.pinimg.com/736x/12/34/56/123456789abcdef0123456789abcdef.jpg', prescriptionRequired: false },
-    { id: 122, name: 'Fexofenadine Tablets', price: 150, originalPrice: 180, discount: '17% off', category: 'Anti-Allergy / Antihistamines', brand: 'BrandZ', image: 'https://i.pinimg.com/736x/23/45/67/23456789abcdef0123456789abcdef0.jpg', prescriptionRequired: false },
-    { id: 123, name: 'Diphenhydramine Capsules', price: 90, originalPrice: null, discount: '', category: 'Anti-Allergy / Antihistamines', brand: 'BrandW', image: 'https://i.pinimg.com/736x/34/56/78/3456789abcdef0123456789abcdef01.jpg', prescriptionRequired: true },
-    { id: 124, name: 'Levocetirizine Tablets', price: 110, originalPrice: 130, discount: '15% off', category: 'Anti-Allergy / Antihistamines', brand: 'BrandX', image: 'https://i.pinimg.com/736x/45/67/89/456789abcdef0123456789abcdef012.jpg', prescriptionRequired: false },
-    { id: 125, name: 'Antihistamine Cream', price: 70, originalPrice: null, discount: '', category: 'Anti-Allergy / Antihistamines', brand: 'BrandZ', image: 'https://i.pinimg.com/736x/56/78/90/567890abcdef0123456789abcdef0123.jpg', prescriptionRequired: false },
-
-    // Cold & Cough Relief
-    { id: 126, name: 'Cough Syrup', price: 120, originalPrice: 150, discount: '20% off', category: 'Cold & Cough Relief', brand: 'BrandY', image: 'https://i.pinimg.com/736x/67/89/ab/6789abcdef0123456789abcdef01234.jpg', prescriptionRequired: false },
-    { id: 127, name: 'Expectorant Tablets', price: 90, originalPrice: null, discount: '', category: 'Cold & Cough Relief', brand: 'BrandW', image: 'https://i.pinimg.com/736x/78/90/bc/7890bcdef0123456789abcdef012345.jpg', prescriptionRequired: false },
-    { id: 128, name: 'Cold Relief Capsules', price: 100, originalPrice: 120, discount: '17% off', category: 'Cold & Cough Relief', brand: 'BrandX', image: 'https://i.pinimg.com/736x/89/ab/cd/89abcdef0123456789abcdef0123456.jpg', prescriptionRequired: false },
-    { id: 129, name: 'Dextromethorphan Syrup', price: 130, originalPrice: null, discount: '', category: 'Cold & Cough Relief', brand: 'BrandZ', image: 'https://i.pinimg.com/736x/90/bc/de/90bcdef0123456789abcdef01234567.jpg', prescriptionRequired: true },
-    { id: 130, name: 'Menthol Cough Drops', price: 50, originalPrice: 60, discount: '17% off', category: 'Cold & Cough Relief', brand: 'BrandY', image: 'https://i.pinimg.com/736x/ab/cd/ef/abcdef0123456789abcdef012345678.jpg', prescriptionRequired: false },
-    { id: 131, name: 'Guaifenesin Tablets', price: 110, originalPrice: null, discount: '', category: 'Cold & Cough Relief', brand: 'BrandW', image: 'https://i.pinimg.com/736x/bc/de/f0/bcdef0123456789abcdef0123456789.jpg', prescriptionRequired: false },
-
-    // Nasal Sprays & Decongestants
-    { id: 132, name: 'Oxymetazoline Nasal Spray', price: 150, originalPrice: 180, discount: '17% off', category: 'Nasal Sprays & Decongestants', brand: 'BrandX', image: 'https://i.pinimg.com/736x/cd/ef/01/cdef0123456789abcdef0123456789a.jpg', prescriptionRequired: false },
-    { id: 133, name: 'Pseudoephedrine Tablets', price: 100, originalPrice: null, discount: '', category: 'Nasal Sprays & Decongestants', brand: 'BrandZ', image: 'https://i.pinimg.com/736x/de/f0/12/def0123456789abcdef0123456789ab.jpg', prescriptionRequired: false },
-    { id: 134, name: 'Saline Nasal Spray', price: 80, originalPrice: 100, discount: '20% off', category: 'Nasal Sprays & Decongestants', brand: 'BrandY', image: 'https://i.pinimg.com/736x/ef/01/23/ef0123456789abcdef0123456789abc.jpg', prescriptionRequired: false },
-    { id: 135, name: 'Phenylephrine Drops', price: 90, originalPrice: null, discount: '', category: 'Nasal Sprays & Decongestants', brand: 'BrandW', image: 'https://i.pinimg.com/736x/f0/12/34/f0123456789abcdef0123456789abcd.jpg', prescriptionRequired: true },
-    { id: 136, name: 'Fluticasone Nasal Spray', price: 200, originalPrice: 250, discount: '20% off', category: 'Nasal Sprays & Decongestants', brand: 'BrandX', image: 'https://i.pinimg.com/1200x/4d/0c/dd/4d0cdde377dea773bddbaf5310e6aefc.jpg', prescriptionRequired: true },
-    { id: 137, name: 'Decongestant Capsules', price: 120, originalPrice: null, discount: '', category: 'Nasal Sprays & Decongestants', brand: 'BrandZ', image: 'https://i.pinimg.com/736x/12/34/56/123456789abcdef0123456789abcdef.jpg', prescriptionRequired: false },
-
-    // Throat Lozenges
-    { id: 138, name: 'Menthol Lozenges', price: 50, originalPrice: 60, discount: '17% off', category: 'Throat Lozenges', brand: 'BrandY', image: 'https://i.pinimg.com/736x/23/45/67/23456789abcdef0123456789abcdef0.jpg', prescriptionRequired: false },
-    { id: 139, name: 'Honey Lemon Lozenges', price: 60, originalPrice: null, discount: '', category: 'Throat Lozenges', brand: 'BrandW', image: 'https://i.pinimg.com/736x/34/56/78/3456789abcdef0123456789abcdef01.jpg', prescriptionRequired: false },
-    { id: 140, name: 'Eucalyptus Lozenges', price: 55, originalPrice: 70, discount: '21% off', category: 'Throat Lozenges', brand: 'BrandX', image: 'https://i.pinimg.com/736x/45/67/89/456789abcdef0123456789abcdef012.jpg', prescriptionRequired: false },
-    { id: 141, name: 'Zinc Lozenges', price: 70, originalPrice: null, discount: '', category: 'Throat Lozenges', brand: 'BrandZ', image: 'https://i.pinimg.com/736x/56/78/90/567890abcdef0123456789abcdef0123.jpg', prescriptionRequired: false },
-    { id: 142, name: 'Herbal Throat Lozenges', price: 65, originalPrice: 80, discount: '19% off', category: 'Throat Lozenges', brand: 'BrandY', image: 'https://i.pinimg.com/736x/67/89/ab/6789abcdef0123456789abcdef01234.jpg', prescriptionRequired: false },
-    { id: 143, name: 'Sugar-Free Lozenges', price: 75, originalPrice: null, discount: '', category: 'Throat Lozenges', brand: 'BrandW', image: 'https://i.pinimg.com/736x/78/90/bc/7890bcdef0123456789abcdef012345.jpg', prescriptionRequired: false },
-
-    // RX
-    { id: 144, name: 'Prescription Antihistamine', price: 200, originalPrice: null, discount: '', category: 'Anti-Allergy / Antihistamines', brand: 'BrandX', image: 'https://i.pinimg.com/736x/89/ab/cd/89abcdef0123456789abcdef0123456.jpg', prescriptionRequired: true },
-    { id: 145, name: 'Codeine Cough Syrup', price: 250, originalPrice: 300, discount: '17% off', category: 'Cold & Cough Relief', brand: 'BrandZ', image: 'https://i.pinimg.com/736x/90/bc/de/90bcdef0123456789abcdef01234567.jpg', prescriptionRequired: true }
-  ];
+  let products = []; // Will be populated from API
 
   // ================
   // DOM Elements
@@ -57,8 +20,146 @@ document.addEventListener('DOMContentLoaded', () => {
   const cartCountElement = document.getElementById('cart-count');
 
   // keep track of active filters
-  let activeCategory = null; // null = all
+  let activeCategory = null;
   let activeSort = null;
+
+  // ================
+  // API Integration
+  // ================
+  const API_BASE_URL = 'http://localhost:8083/api/products';
+
+  // Function to fetch products by subcategory
+  async function fetchProductsBySubCategory(subCategory) {
+    try {
+      console.log('Fetching products for subcategory:', subCategory);
+      
+      const response = await fetch(`${API_BASE_URL}/get-by-sub-category/${encodeURIComponent(subCategory)}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const products = await response.json();
+      console.log(`Fetched ${products.length} products for subcategory: ${subCategory}`);
+      
+      // Debug: Log the first product to see image data
+      if (products.length > 0) {
+        console.log('Sample product data:', products[0]);
+        console.log('Image URL of first product:', products[0].productMainImage);
+      }
+      
+      return products;
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      return [];
+    }
+  }
+
+  // Function to fetch all products (fallback)
+  async function fetchAllProducts() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/get-all-products?page=0&size=100`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      return data.content || [];
+    } catch (error) {
+      console.error('Error fetching all products:', error);
+      return [];
+    }
+  }
+
+  // Initialize products based on subcategory "allergy"
+  async function initializeProducts() {
+    console.log('Fetching products for subcategory: allergy');
+    
+    // Fetch products for "allergy" subcategory
+    products = await fetchProductsBySubCategory('allergy');
+    
+    // If no products found with subcategory, fallback to all products
+    if (products.length === 0) {
+      console.log('No products found for subcategory "allergy", fetching all products');
+      products = await fetchAllProducts();
+    }
+    
+    // Transform API response to match frontend structure
+    products = products.map(product => {
+      const imageUrl = getProductImageUrl(product);
+      console.log(`Product: ${product.productName}, Image URL: ${imageUrl}`);
+      
+      return {
+        id: product.productId,
+        name: product.productName,
+        price: product.productPrice,
+        originalPrice: product.originalPrice,
+        discount: product.discountPercentage ? `${product.discountPercentage}% off` : '',
+        category: product.productCategory,
+        brand: product.brandName || 'Generic',
+        image: imageUrl,
+        prescriptionRequired: product.prescriptionRequired || false,
+        // Include backend fields for compatibility
+        productId: product.productId,
+        productName: product.productName,
+        productPrice: product.productPrice,
+        productMainImage: product.productMainImage,
+        productCategory: product.productCategory,
+        brandName: product.brandName
+      };
+    });
+    
+    console.log('Final products array:', products);
+    displayProducts(products);
+    updateCartCount();
+  }
+
+  // Function to get proper product image URL
+  function getProductImageUrl(product) {
+    // Check if productMainImage exists and is valid
+    if (product.productMainImage && 
+        product.productMainImage !== 'undefined' && 
+        product.productMainImage !== 'null' && 
+        product.productMainImage !== '' &&
+        product.productMainImage !== 'NULL') {
+      
+      let imageUrl = product.productMainImage.trim();
+      
+      // If it's already an absolute URL, return as is
+      if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+        return imageUrl;
+      }
+      
+      // If it starts with /, make it absolute with localhost
+      if (imageUrl.startsWith('/')) {
+        return `http://localhost:8083${imageUrl}`;
+      }
+      
+      // Otherwise, assume it's relative to the API base
+      return `${API_BASE_URL}/${imageUrl}`;
+    }
+    
+    // If no valid image, try to construct from product ID
+    if (product.productId) {
+      return `${API_BASE_URL}/${product.productId}/image`;
+    }
+    
+    // Last resort - return empty string (no image)
+    return '';
+  }
+
+  // Handle image loading errors
+  function handleImageError(img) {
+    console.log('Image failed to load, hiding image element');
+    img.style.display = 'none';
+    
+    // Show a text placeholder instead of dummy image
+    const parent = img.parentElement;
+    const placeholder = document.createElement('div');
+    placeholder.className = 'w-full h-32 bg-gray-200 rounded-lg mb-3 flex items-center justify-center';
+    placeholder.innerHTML = '<span class="text-gray-500 text-sm">No Image</span>';
+    
+    img.insertAdjacentElement('afterend', placeholder);
+  }
 
   // ================
   // Helpers
@@ -88,6 +189,10 @@ document.addEventListener('DOMContentLoaded', () => {
       ? '<div class="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">Rx Required</div>'
       : '';
 
+    const imageHtml = product.image 
+      ? `<img src="${product.image}" alt="${escapeHtml(product.name)}" class="product-image w-full h-32 rounded-lg mb-3 object-cover" onerror="handleImageError(this)">`
+      : '<div class="w-full h-32 bg-gray-200 rounded-lg mb-3 flex items-center justify-center"><span class="text-gray-500 text-sm">No Image Available</span></div>';
+
     const actionButton = product.prescriptionRequired
       ? `<button 
             class="mt-3 w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg transition flex items-center justify-center gap-2 upload-pres-btn" 
@@ -109,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     productDiv.innerHTML = `
       ${prescriptionBadge}
-      <img src="${product.image}" alt="${escapeHtml(product.name)}" class="product-image w-full h-32 rounded-lg mb-3">
+      ${imageHtml}
       <p class="text-sm text-gray-600 font-medium">${escapeHtml(product.name)}</p>
       <p class="text-xs text-gray-500">${escapeHtml(product.brand)}</p>
       ${product.prescriptionRequired ? '<p class="text-red-600 text-xs mt-1 font-semibold">⚠️ Prescription needed</p>' : ''}
@@ -120,40 +225,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // click handlers
     productDiv.addEventListener('click', (event) => {
-      // If clicked a button inside, ignore (buttons have own handlers)
       if (event.target.tagName === 'BUTTON' || event.target.closest('button')) return;
       if (product.prescriptionRequired) {
-        // for card click, open modal as well
         openUploadModalForProduct(product);
       } else {
         openProductDetails(product);
       }
     });
 
-    // attach inner button handlers after insertion (or via delegation later)
     return productDiv;
   }
 
   function displayProducts(list) {
     if (!productGrid) return;
+    
+    if (list.length === 0) {
+      productGrid.innerHTML = `
+        <div class="col-span-full text-center py-8">
+          <p class="text-gray-500">No allergy products found.</p>
+          <p class="text-sm text-gray-400 mt-2">Try refreshing the page or check back later.</p>
+        </div>
+      `;
+      return;
+    }
+    
     productGrid.innerHTML = '';
     list.forEach(product => productGrid.appendChild(createProductCard(product)));
   }
-
-  // initial display (all)
-  displayProducts(products);
 
   // ================
   // Product interactions
   // ================
   function openProductDetails(product) {
-    // go to productdetails with id query param
     const productDetailsUrl = `/productdetails.html?id=${product.id}`;
     window.location.href = productDetailsUrl;
   }
-  window.openProductDetails = openProductDetails; // expose
+  window.openProductDetails = openProductDetails;
 
-  // add to cart (used by other pages too)
   function addToCartById(productId) {
     const product = products.find(p => p.id == productId);
     if (!product) return;
@@ -162,50 +270,26 @@ document.addEventListener('DOMContentLoaded', () => {
     else cart.push({ ...product, quantity: 1 });
     localStorage.setItem('cart', JSON.stringify(cart));
     updateCartCount();
-    // optional: small toast can be added, but keep as alert for now
-    // alert(`${product.name} added to cart`);
   }
   window.addToCart = addToCartById;
 
   // ================
   // Category & Brand Filters
   // ================
-  // Single combined click handler for category list (expand / filter)
   categoryList?.addEventListener('click', (e) => {
-    // expand toggle
     if (e.target.classList.contains('expand-toggle')) {
       const li = e.target.parentElement;
       const subcategory = li.querySelector('.subcategory');
       if (subcategory) {
         subcategory.classList.toggle('hidden');
-      } else {
-        const category = li.querySelector('.category-link')?.textContent?.trim();
-        if (category) {
-          const subItems = products
-            .filter(p => p.category === category)
-            .map(p => p.name);
-          if (subItems.length) {
-            const ul = document.createElement('ul');
-            ul.className = 'subcategory hidden ml-4 space-y-2';
-            subItems.forEach(item => {
-              const li2 = document.createElement('li');
-              li2.innerHTML = `<a href="#" class="subcategory-link text-sm text-gray-600 hover:text-primary">${escapeHtml(item)}</a>`;
-              ul.appendChild(li2);
-            });
-            li.appendChild(ul);
-            ul.classList.toggle('hidden');
-          }
-        }
       }
       e.target.textContent = e.target.textContent === '+' ? '-' : '+';
       return;
     }
 
-    // filter by category link or subcategory link
     if (e.target.classList.contains('category-link') || e.target.classList.contains('subcategory-link')) {
       e.preventDefault();
       const text = e.target.textContent.trim();
-      // if it's a product name (subcategory-link), filter by name else by category
       let filtered;
       if (e.target.classList.contains('subcategory-link')) {
         filtered = products.filter(p => p.name === text);
@@ -237,7 +321,7 @@ document.addEventListener('DOMContentLoaded', () => {
     applyFilters(products);
   });
 
-  // Apply filters: input is a starting list (filtered by category already if provided)
+  // Apply filters
   function applyFilters(startList) {
     let list = Array.isArray(startList) ? [...startList] : [...products];
 
@@ -265,28 +349,26 @@ document.addEventListener('DOMContentLoaded', () => {
   // ================
   // Upload Prescription Modal Integration
   // ================
-  // Helper to open modal for a product
   function openUploadModalForProduct(product) {
     if (!uploadModal) {
-      // fallback: redirect to prescribed page
       window.location.href = `/prescribed.html?id=${product.id}`;
       return;
     }
 
-    // set dataset and update modal placeholders
     uploadModal.dataset.productId = product.id;
-    // Product name display area (assumes #modalProductName exists in HTML)
     const modalProductName = uploadModal.querySelector('#modalProductName') || uploadModal.querySelector('#modalProductName') || document.getElementById('modalProductName');
     if (modalProductName) modalProductName.textContent = `Upload Prescription for: ${product.name}`;
 
-    // product image placeholder if present
     const modalProductImage = uploadModal.querySelector('.modal-product-image');
-    if (modalProductImage) modalProductImage.src = product.image;
+    if (modalProductImage) {
+      modalProductImage.src = product.image || '';
+      modalProductImage.onerror = function() {
+        this.style.display = 'none';
+      };
+    }
 
-    // ensure file input exists and bind change handler
     let fileInput = uploadModal.querySelector('#prescriptionFile');
     if (!fileInput) {
-      // try to find any input[type=file]
       fileInput = uploadModal.querySelector('input[type="file"]');
     }
     if (!fileInput) {
@@ -298,10 +380,8 @@ document.addEventListener('DOMContentLoaded', () => {
       uploadModal.querySelector('label')?.appendChild(fileInput) || uploadModal.appendChild(fileInput);
     }
 
-    // show file name display element if present
     const fileNameDisplay = uploadModal.querySelector('#fileNameDisplay') || document.getElementById('fileNameDisplay');
 
-    // remove previous change listeners to avoid duplicates
     const newFileInput = fileInput.cloneNode();
     newFileInput.id = fileInput.id;
     newFileInput.accept = fileInput.accept;
@@ -317,7 +397,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (fileNameDisplay) fileNameDisplay.textContent = file.name;
 
-      // optionally preview if image
       if (file.type.startsWith('image/')) {
         const previewImg = uploadModal.querySelector('#prescriptionPreviewImg');
         const reader = new FileReader();
@@ -326,22 +405,18 @@ document.addEventListener('DOMContentLoaded', () => {
             previewImg.src = evt.target.result;
             previewImg.classList.remove('hidden');
           }
-          // store temporarily on modal to submit on click of Submit
           uploadModal.dataset.tempDataURL = evt.target.result;
           uploadModal.dataset.tempFileName = file.name;
         };
         reader.readAsDataURL(file);
       } else {
-        // not an image (pdf etc.), just store filename
-        uploadModal.dataset.tempDataURL = ''; // not stored as preview
+        uploadModal.dataset.tempDataURL = '';
         uploadModal.dataset.tempFileName = file.name;
       }
     });
 
-    // wire Choose File label (if label exists) to open file input
     const label = uploadModal.querySelector('label');
     if (label) {
-      // remove previous listeners and add one
       label.addEventListener('click', (ev) => {
         ev.preventDefault();
         const fi = uploadModal.querySelector('#prescriptionFile');
@@ -349,17 +424,15 @@ document.addEventListener('DOMContentLoaded', () => {
       }, { once: true });
     }
 
-    // Submit button logic
     const submitBtn = uploadModal.querySelector('#submitPrescription') || document.getElementById('submitPrescription');
     if (submitBtn) {
-      // remove previous handler if any by cloning
       const newBtn = submitBtn.cloneNode(true);
       submitBtn.parentNode.replaceChild(newBtn, submitBtn);
       newBtn.addEventListener('click', () => {
         const prodId = uploadModal.dataset.productId;
         const tmpName = uploadModal.dataset.tempFileName;
         const tmpData = uploadModal.dataset.tempDataURL || null;
-        // fallback: if file input has file but we didn't capture dataset, read now
+        
         const fi = uploadModal.querySelector('#prescriptionFile');
         if (!tmpName && fi && fi.files[0]) {
           const file = fi.files[0];
@@ -378,21 +451,16 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
 
-        // Save to localStorage
         savePrescription(prodId, tmpName, tmpData);
-        // hide modal
         uploadModal.classList.add('hidden');
         clearModalTempState();
-        // optional feedback
         alert('Prescription uploaded successfully.');
       });
     }
 
-    // finally show the modal
     uploadModal.classList.remove('hidden');
   }
 
-  // function to save prescription into localStorage
   function savePrescription(productId, fileName, dataURL) {
     if (!productId) return;
     const prescriptions = JSON.parse(localStorage.getItem('prescriptions') || '{}');
@@ -408,7 +476,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!uploadModal) return;
     delete uploadModal.dataset.tempFileName;
     delete uploadModal.dataset.tempDataURL;
-    // clear preview if present
     const previewImg = uploadModal.querySelector('#prescriptionPreviewImg');
     if (previewImg) {
       previewImg.src = '';
@@ -416,14 +483,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const fileNameDisplay = uploadModal.querySelector('#fileNameDisplay');
     if (fileNameDisplay) fileNameDisplay.textContent = '';
-    // reset file input
     const fi = uploadModal.querySelector('#prescriptionFile');
     if (fi) fi.value = '';
   }
 
-  // attach upload buttons via event delegation (handles dynamically created cards too)
+  // Event delegation for dynamic buttons
   document.body.addEventListener('click', (e) => {
-    // upload button
     const up = e.target.closest('.upload-pres-btn');
     if (up) {
       e.stopPropagation();
@@ -433,14 +498,12 @@ document.addEventListener('DOMContentLoaded', () => {
           const product = JSON.parse(unescapeHtml(productData));
           openUploadModalForProduct(product);
         } catch (err) {
-          // fallback: if data not parseable, use redirect
           window.location.href = `/prescribed.html`;
         }
       }
       return;
     }
 
-    // add-to-cart / view-details button -> open product details page (onclick uses openProductDetails)
     const atc = e.target.closest('.add-to-cart-btn');
     if (atc) {
       e.stopPropagation();
@@ -450,7 +513,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // modal backdrop click to close
+  // Modal event listeners
   if (uploadModal) {
     uploadModal.addEventListener('click', (e) => {
       if (e.target === uploadModal) {
@@ -459,7 +522,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // close button (if you have one with id closeUploadModal)
     const closeUploadModalBtn = document.getElementById('closeUploadModal');
     if (closeUploadModalBtn) {
       closeUploadModalBtn.addEventListener('click', () => {
@@ -469,7 +531,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // valid prescription modal wiring
   if (validPrescriptionBtn && validPrescriptionModal) {
     validPrescriptionBtn.addEventListener('click', () => validPrescriptionModal.classList.remove('hidden'));
     validPrescriptionModal.addEventListener('click', (e) => { if (e.target === validPrescriptionModal) validPrescriptionModal.classList.add('hidden'); });
@@ -490,49 +551,18 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function unescapeHtml(encoded) {
-    // small helper in case we stored JSON with escaped quotes
     if (!encoded) return encoded;
     return encoded.replace(/&quot;/g, '"').replace(/&amp;/g, '&');
   }
 
-  // We stored escaped JSON string in data-product (escapeHtml used earlier), recover it:
-  function unescapeHtmlForJSON(escapedStr) {
-    if (!escapedStr) return escapedStr;
-    // replace HTML entities that were used on JSON string
-    return escapedStr.replace(/&quot;/g, '"').replace(/&amp;/g, '&');
-  }
-
-  // parse helper used earlier in event delegation
-  function unescapeHtml(s) {
-    if (!s) return s;
-    return s.replace(/&quot;/g, '"').replace(/&amp;/g, '&');
-  }
-
-  // safe JSON parse wrapper
-  function safeParseProductData(attr) {
-    if (!attr) return null;
-    try {
-      const jsonStr = attr.replace(/&quot;/g, '"').replace(/&amp;/g, '&');
-      return JSON.parse(jsonStr);
-    } catch (err) {
-      return null;
-    }
-  }
-
-  // earlier we referenced unescapeHtml in delegation; ensure a function exists
-  function unescapeHtmlForDelegation(s) {
-    return safeParseProductData(s) ? safeParseProductData(s) : null;
-  }
-
-  // Small fix: the delegation earlier used unescapeHtml/unescapeHtmlForJSON - replace with safeParseProductData call
-  // So adjust the delegation code above to use safeParseProductData (we already attempted parsing with unescapeHtml in the upload handler).
-
   // ================
-  // Finalize & Expose
+  // Initialize
   // ================
-  // Expose upload function globally in case generated HTML uses onclick inline attributes
+  // Start the application
+  initializeProducts();
+
+  // Expose functions globally
   window.uploadPrescription = function (productObjOrId) {
-    // If called with a number or string id, find product object
     if (typeof productObjOrId === 'number' || typeof productObjOrId === 'string') {
       const p = products.find(x => x.id == productObjOrId);
       if (p) openUploadModalForProduct(p);
@@ -540,16 +570,10 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (typeof productObjOrId === 'object' && productObjOrId !== null) {
       openUploadModalForProduct(productObjOrId);
     } else {
-      // fallback
       window.location.href = '/prescribed.html';
     }
   };
 
-  // Expose addToCart in global scope
   window.addToCart = addToCartById;
-
-  // ensure page has products shown with current filters
-  applyFilters(products);
+  window.handleImageError = handleImageError; // Expose for inline use
 });
-
-

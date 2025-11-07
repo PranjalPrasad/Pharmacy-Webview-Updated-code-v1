@@ -55,6 +55,7 @@
     }
   </style>
 </head>
+
 <body class="bg-white" onload="initializePage()">
   <!-- Header Placeholder (loads header.html dynamically) -->
     <div id="header-placeholder"></div>
@@ -283,26 +284,38 @@
 
   </div>
 </div>
-      <!-- Dynamic Header Loader Script -->
-    <script>
-        // Load header.html dynamically on page load
-        window.addEventListener('DOMContentLoaded', function() {
-            fetch('/header.html')
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById('header-placeholder').innerHTML = data;
-                    // Re-initialize any header-specific scripts if needed (e.g., call initializePage() again if it depends on header)
-                    if (typeof initializePage === 'function') {
-                        initializePage();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error loading header:', error);
-                    // Fallback: Optionally display a message or load inline header as backup
-                });
+<script>
+    // Load header.html dynamically on page load
+window.addEventListener('DOMContentLoaded', function() {
+    fetch('/header.html')
+        .then(response => {
+            if (!response.ok) throw new Error('Header not found');
+            return response.text();
+        })
+        .then(data => {
+            document.getElementById('header-placeholder').innerHTML = data;
+            
+            // Wait for header elements to be in DOM before initializing
+            setTimeout(() => {
+                if (typeof initializePage === 'function') {
+                    initializePage();
+                }
+                // Re-initialize first.js functionality
+                if (window.firstJSInit) {
+                    window.firstJSInit();
+                }
+            }, 100);
+        })
+        .catch(error => {
+            console.error('Error loading header:', error);
+            // Provide fallback header or continue without it
         });
-    </script>
-  <script src="/header.js"></script>
-  <script src="../FIRST AID & EMERGENCY/first.js"></script>
+});
+</script>
+
+     <script src="../FIRST AID & EMERGENCY/first.js"> </script>
+
+  <script src="/header.js"> </script>
+ 
 </body>
 </html>

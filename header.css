@@ -520,4 +520,12 @@ body[lang="hi"], body[lang="mr"] {
     }
 }
 
+/* Existing styles remain unchanged */
+/* Add this at the end */
 
+#logoutConfirmOverlay {
+    display: none;
+}
+#logoutConfirmOverlay.show {
+    display: flex;
+}

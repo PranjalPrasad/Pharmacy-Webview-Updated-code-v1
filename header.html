@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title data-i18n="title">MediCare - Your Trusted Pharmacy</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-    <link rel="stylesheet" href="header.css">
+   <link rel="stylesheet" href="/header.css">
 </head>
 <body>
 
@@ -49,20 +49,20 @@
                     <button id="validatePincode" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-accent mt-4 w-full text-base" data-i18n="submit">Submit</button>
                 </div>
             </div>
-<!-- Language Selection Modal -->
-<div id="languageModal" class="modal">
-    <div class="modal-content language-modal-content">
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-lg font-semibold ml-14" data-i18n="select_language">Select Language</h2>
-            <button id="closeLanguageModal" class="text-gray-500 hover:text-gray-700 mb-8">
-                <i class="fas fa-times text-xl"></i>
-            </button>
-        </div>
-        <button class="language-btn bg-primary text-white" data-lang="English" data-i18n="english">English</button>
-        <button class="language-btn bg-primary text-white" data-lang="Hindi" data-i18n="hindi">Hindi</button>
-        <button class="language-btn bg-primary text-white" data-lang="Marathi" data-i18n="marathi">Marathi</button>
-    </div>
-</div>
+            <!-- Language Selection Modal -->
+            <div id="languageModal" class="modal">
+                <div class="modal-content language-modal-content">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold ml-14" data-i18n="select_language">Select Language</h2>
+                        <button id="closeLanguageModal" class="text-gray-500 hover:text-gray-700 mb-8">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    <button class="language-btn bg-primary text-white" data-lang="English" data-i18n="english">English</button>
+                    <button class="language-btn bg-primary text-white" data-lang="Hindi" data-i18n="hindi">Hindi</button>
+                    <button class="language-btn bg-primary text-white" data-lang="Marathi" data-i18n="marathi">Marathi</button>
+                </div>
+            </div>
             <!-- Right side items -->
             <div class="flex items-center space-x-1 sm:space-x-2 md:space-x-5">
                 <!-- Language Button -->
@@ -72,7 +72,7 @@
                         <span id="currentLanguage">EN</span>
                     </button>
                 </div>
-                <!-- Login -->
+                <!-- Login / Logout Trigger -->
                 <a href="#" id="loginTrigger" class="flex items-center text-gray-700 hover:text-primary text-base sm:text-sm">
                     <i class="fas fa-user-circle"></i>
                     <span class="hidden md:inline ml-1" data-i18n="login">Login</span>
@@ -82,26 +82,25 @@
                     <i class="fas fa-heart"></i>
                     <span class="hidden md:inline ml-1" data-i18n="wishlist">Wishlist</span>
                 </a>
-        
-                <!-- NEW: My Orders -->
+                <!-- My Orders -->
                 <a href="/MY ORDERS/myorders.html" class="flex items-center text-gray-700 hover:text-primary text-base sm:text-sm"
                    onclick="goToMyOrders(); return false;">
                     <i class="fas fa-box"></i>
                     <span class="hidden md:inline ml-1" data-i18n="my_orders">My Orders</span>
                 </a>
-                <!-- NEW: My Profile -->
+                <!-- My Profile -->
                 <a href="#" class="flex items-center text-gray-700 hover:text-primary text-base sm:text-sm"
                    onclick="goToMyProfile(); return false;">
                     <i class="fas fa-id-card"></i>
                     <span class="hidden md:inline ml-1" data-i18n="my_profile">My Profile</span>
                 </a>
-                <!-- NEW: Contact -->
+                <!-- Contact -->
                 <a href="#" class="flex items-center text-gray-700 hover:text-primary text-base sm:text-sm"
                    onclick="goToContact(); return false;">
                     <i class="fas fa-phone"></i>
                     <span class="hidden md:inline ml-1" data-i18n="contact">Contact</span>
                 </a>
-       <!-- About -->
+                <!-- About -->
                 <a href="/about.html" class="flex items-center text-gray-700 hover:text-primary text-base sm:text-sm">
                     <i class="fas fa-tag"></i>
                     <span class="hidden md:inline ml-1" data-i18n="About">About</span>
@@ -202,7 +201,6 @@
                             <a href="/SPECIALITY CARE/AYURVEDIC/ayurved.html" class="block px-4 py-2" data-i18n="ayurveda_herbal">Ayurveda & Herbal Products</a>
                         </div>
                     </div>
-                   
                 </div>
             </div>
         </div>
@@ -233,7 +231,7 @@
             <div id="login-tab" class="auth-tab active" data-i18n="login">Login</div>
             <div id="signup-tab" class="auth-tab" data-i18n="signup">Sign Up</div>
         </div>
-<div id="login-form" class="auth-form">
+        <div id="login-form" class="auth-form">
             <div class="form-group">
                 <label data-i18n="phone">Phone Number</label>
                 <input id="loginPhone" type="tel" data-i18n-placeholder="phone">
@@ -279,27 +277,26 @@
                 <input id="signupPhone" type="tel" maxlength="10" data-i18n-placeholder="phone">
                 <small class="text-red-500 text-xs hidden" id="phoneError"></small>
             </div>
-             <div class="form-group">
-        <label data-i18n="password">Password</label>
-        <div class="relative">
-            <input id="signupPassword" type="password" data-i18n-placeholder="password" class="pr-10">
-            <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
-                <i class="fas fa-eye"></i>
-            </button>
-        </div>
-        <small class="text-red-500 text-xs hidden" id="passwordError"></small>
-    </div>
-    
-    <div class="form-group">
-        <label data-i18n="confirm_password">Confirm Password</label>
-        <div class="relative">
-            <input id="signupConfirmPassword" type="password" data-i18n-placeholder="confirm_password" class="pr-10">
-            <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
-                <i class="fas fa-eye"></i>
-            </button>
-        </div>
-        <small class="text-red-500 text-xs hidden" id="confirmPasswordError"></small>
-    </div>
+            <div class="form-group">
+                <label data-i18n="password">Password</label>
+                <div class="relative">
+                    <input id="signupPassword" type="password" data-i18n-placeholder="password" class="pr-10">
+                    <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <small class="text-red-500 text-xs hidden" id="passwordError"></small>
+            </div>
+            <div class="form-group">
+                <label data-i18n="confirm_password">Confirm Password</label>
+                <div class="relative">
+                    <input id="signupConfirmPassword" type="password" data-i18n-placeholder="confirm_password" class="pr-10">
+                    <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <small class="text-red-500 text-xs hidden" id="confirmPasswordError"></small>
+            </div>
             <div class="form-group">
                 <label data-i18n="address_landmark">Landmark</label>
                 <input id="addressLandmark" type="text" data-i18n-placeholder="address_landmark">
@@ -349,6 +346,7 @@
         </div>
     </div>
     <div id="auth-overlay" class="auth-overlay"></div>
+
     <!-- Forget Password Modal -->
     <div id="forgetPasswordModal" class="modal hidden">
         <div class="modal-content2">
@@ -361,8 +359,20 @@
             <button id="closeForgetModal" data-i18n="close">Close</button>
         </div>
     </div>
+
+    <!-- Logout Confirmation Overlay -->
+    <div id="logoutConfirmOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-lg p-6 max-w-sm w-full shadow-xl">
+            <h3 class="text-lg font-semibold mb-4" data-i18n="confirm_logout">Confirm Logout</h3>
+            <p class="text-gray-600 mb-6" data-i18n="logout_message">Are you sure you want to log out?</p>
+            <div class="flex justify-end space-x-3">
+                <button id="cancelLogout" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100">Cancel</button>
+                <button id="confirmLogout" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Logout</button>
+            </div>
+        </div>
+    </div>
 </header>
 
-<script src="header.js"></script>
+<script src="/header.js"></script>
 </body>
 </html>

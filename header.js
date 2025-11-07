@@ -1,3 +1,6 @@
+// =============================================
+// TRANSLATIONS (unchanged)
+// =============================================
 const translations = {
     en: {
         title: "MediCare - Your Trusted Pharmacy",
@@ -76,7 +79,13 @@ const translations = {
         existing_customer: "Already a user? Login",
         close: "Close",
         reset_password: "Reset Password",
-        send_reset_link: "Send Reset Link"
+        send_reset_link: "Send Reset Link",
+        my_orders: "My Orders",
+        my_profile: "My Profile",
+        contact: "Contact",
+        About: "About",
+        confirm_logout: "Confirm Logout",
+        logout_message: "Are you sure you want to log out?"
     },
     hi: {
         title: "मेडिकेयर - आपकी विश्वसनीय फार्मेसी",
@@ -155,7 +164,9 @@ const translations = {
         existing_customer: "पहले से उपयोगकर्ता? लॉगिन",
         close: "बंद करें",
         reset_password: "पासवर्ड रीसेट करें",
-        send_reset_link: "रीसेट लिंक भेजें"
+        send_reset_link: "रीसेट लिंक भेजें",
+        confirm_logout: "लॉगआउट की पुष्टि करें",
+        logout_message: "क्या आप वाकई लॉगआउट करना चाहते हैं?"
     },
     mr: {
         title: "मेडिकेअर - तुमचा विश्वासू फार्मसी",
@@ -234,10 +245,209 @@ const translations = {
         existing_customer: "आधीच वापरकर्ता? लॉगिन",
         close: "बंद करा",
         reset_password: "पासवर्ड रीसेट करा",
-        send_reset_link: "रीसेट लिंक पाठवा"
+        send_reset_link: "रीसेट लिंक पाठवा",
+        confirm_logout: "लॉगआउट निश्चित करा",
+        logout_message: "तुम्हाला खरंच लॉगआउट करायचं आहे का?"
     }
 };
 
+// =============================================
+// API CONFIGURATION & HELPER FUNCTIONS
+// =============================================
+const API_BASE_URL = 'http://localhost:8083/api/users';
+async function apiRequest(endpoint, method = 'GET', data = null) {
+    const options = {
+        method,
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    };
+    if (data) {
+        options.body = JSON.stringify(data);
+    }
+    try {
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+       
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || `HTTP error! status: ${response.status}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('API request failed:', error);
+        throw error;
+    }
+}
+
+// Updated login function to use your backend endpoint
+// =============================================
+// UPDATED LOGIN FUNCTION - Use the proper backend login endpoint
+// =============================================
+async function loginUser(phone, password) {
+    try {
+        console.log('Attempting login with:', { phone, password });
+        
+        // Use the correct login endpoint that matches your backend
+        const response = await fetch(`${API_BASE_URL}/login?mobile=${phone}&password=${password}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        console.log('Login response status:', response.status);
+        
+        if (!response.ok) {
+            // If response is not OK, try to get error message
+            let errorMessage = 'Login failed';
+            try {
+                const errorData = await response.json();
+                errorMessage = errorData.error || errorMessage;
+            } catch (e) {
+                // If we can't parse JSON, use status text
+                errorMessage = response.statusText || errorMessage;
+            }
+            throw new Error(errorMessage);
+        }
+
+        const user = await response.json();
+        console.log('Login successful, user:', user);
+        
+        // Store user session
+        const loginData = {
+            user: user,
+            loginTime: Date.now()
+        };
+        
+        try {
+            sessionStorage.setItem('loggedInUser', JSON.stringify(loginData));
+            sessionStorage.setItem('userId', user.userId);
+        } catch (e) {
+            console.warn('Session storage unavailable');
+        }
+        
+        return { success: true, user };
+        
+    } catch (error) {
+        console.error('Login error:', error);
+        return { success: false, message: error.message || 'Login failed. Please try again.' };
+    }
+}
+
+// Keep all your existing API functions the same
+async function createUserAPI(userData) {
+    return await apiRequest('/create-user', 'POST', userData);
+}
+
+async function getAllUsersAPI() {
+    return await apiRequest('/get-all-users', 'GET');
+}
+// API Functions
+async function createUserAPI(userData) {
+    return await apiRequest('/create-user', 'POST', userData);
+}
+async function getAllUsersAPI() {
+    return await apiRequest('/get-all-users', 'GET');
+}
+// Login function with 24-hour session
+// async function loginUser(phone, password) {
+//     try {
+//         const allUsers = await getAllUsersAPI();
+//         const user = allUsers.find(u => u.phone === phone && u.password === password);
+       
+//         if (user) {
+//             const loginData = {
+//                 user: user,
+//                 loginTime: Date.now()
+//             };
+//             try {
+//                 sessionStorage.setItem('loggedInUser', JSON.stringify(loginData));
+//                 sessionStorage.setItem('userId', user.userId);
+//             } catch (e) {
+//                 console.warn('Session storage unavailable');
+//             }
+//             return { success: true, user };
+//         } else {
+//             return { success: false, message: 'Invalid phone number or password' };
+//         }
+//     } catch (error) {
+//         console.error('Login error:', error);
+//         return { success: false, message: 'Login failed. Please try again.' };
+//     }
+// }
+
+// =============================================
+// SESSION & LOGOUT HELPERS
+// =============================================
+function isSessionValid() {
+    try {
+        const data = sessionStorage.getItem('loggedInUser');
+        if (!data) return false;
+        const { loginTime } = JSON.parse(data);
+        const hoursElapsed = (Date.now() - loginTime) / (1000 * 60 * 60);
+        return hoursElapsed < 24;
+    } catch (e) {
+        return false;
+    }
+}
+
+function clearSession() {
+    try {
+        sessionStorage.removeItem('loggedInUser');
+        sessionStorage.removeItem('userId');
+    } catch (e) {
+        console.warn('Failed to clear session');
+    }
+}
+
+function showLogoutConfirm() {
+    const overlay = document.getElementById('logoutConfirmOverlay');
+    if (overlay) overlay.classList.add('show');
+}
+
+function hideLogoutConfirm() {
+    const overlay = document.getElementById('logoutConfirmOverlay');
+    if (overlay) overlay.classList.remove('show');
+}
+
+// =============================================
+// UI UPDATE: Login → Logout
+// =============================================
+function updateLoginTrigger(user) {
+    const trigger = document.getElementById('loginTrigger');
+    if (!trigger) return;
+
+    if (user) {
+        trigger.innerHTML = `
+            <i class="fas fa-user-circle"></i>
+            <span class="hidden md:inline ml-1">Logout</span>
+        `;
+        trigger.onclick = (e) => {
+            e.preventDefault();
+            showLogoutConfirm();
+        };
+    } else {
+        trigger.innerHTML = `
+            <i class="fas fa-user-circle"></i>
+            <span class="hidden md:inline ml-1" data-i18n="login">Login</span>
+        `;
+        trigger.onclick = (e) => {
+            e.preventDefault();
+            const slider = document.getElementById('auth-slider');
+            const overlay = document.getElementById('auth-overlay');
+            if (slider && overlay) {
+                slider.classList.add('active');
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        };
+    }
+    applyLanguage(localStorage.getItem('language') || 'en');
+}
+
+// =============================================
+// INITIALIZATION FUNCTIONS
+// =============================================
 function initializePage() {
     console.log('Initializing page');
     let savedLanguage;
@@ -255,6 +465,7 @@ function initializePage() {
         console.warn('currentLanguage element not found');
     }
     applyLanguage(savedLanguage);
+   
     let savedPincode;
     try {
         savedPincode = localStorage.getItem('pincode');
@@ -262,7 +473,7 @@ function initializePage() {
         console.warn('localStorage unavailable for pincode');
         savedPincode = null;
     }
-   
+  
     const locationDisplay = document.getElementById('locationDisplay');
     const deliveryInfo = document.getElementById('deliveryInfo');
     const deliveryMessage = document.getElementById('deliveryMessage');
@@ -275,12 +486,13 @@ function initializePage() {
     } else {
         showLocationModal();
     }
+   
     initAuthSlider();
     initLanguageSelection();
     initMobileMenu();
     initLocationModal();
     initPasswordToggles();
-    
+   
     const languageButton = document.getElementById('languageButton');
     if (languageButton) {
         languageButton.addEventListener('click', () => {
@@ -290,6 +502,7 @@ function initializePage() {
     } else {
         console.warn('languageButton not found');
     }
+   
     const changeLocation = document.getElementById('changeLocation');
     if (changeLocation) {
         changeLocation.addEventListener('click', (e) => {
@@ -299,57 +512,29 @@ function initializePage() {
     } else {
         console.warn('changeLocation button not found');
     }
+
+    // Check session
+    if (isSessionValid()) {
+        const data = JSON.parse(sessionStorage.getItem('loggedInUser'));
+        updateLoginTrigger(data.user);
+    } else {
+        clearSession();
+        updateLoginTrigger(null);
+    }
+
+    // Logout confirmation handlers (FIXED: addEventListener + removed duplicate)
+    document.getElementById('cancelLogout')?.addEventListener('click', hideLogoutConfirm);
+    document.getElementById('confirmLogout')?.addEventListener('click', () => {
+        clearSession();
+        hideLogoutConfirm();
+        updateLoginTrigger(null);
+        alert('You have been logged out.');
+    });
 }
 
-function applyLanguage(lang) {
-    console.log('Applying language:', lang);
-    document.querySelectorAll('[data-i18n]').forEach(element => {
-        const key = element.getAttribute('data-i18n');
-        if (translations[lang] && translations[lang][key]) {
-            element.textContent = translations[lang][key];
-        } else {
-            console.warn(`Translation missing for lang: ${lang}, key: ${key}`);
-        }
-    });
-    document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
-        const key = element.getAttribute('data-i18n-placeholder');
-        if (translations[lang] && translations[lang][key]) {
-            element.placeholder = translations[lang][key];
-        } else {
-            console.warn(`Placeholder translation missing for lang: ${lang}, key: ${key}`);
-        }
-    });
-    const titleElement = document.querySelector('title');
-    if (titleElement) {
-        const titleKey = titleElement.getAttribute('data-i18n');
-        if (translations[lang] && translations[lang][titleKey]) {
-            titleElement.textContent = translations[lang][titleKey];
-        }
-    }
-   
-    let savedPincode;
-    try {
-        savedPincode = localStorage.getItem('pincode');
-    } catch (e) {
-        savedPincode = null;
-    }
-   
-    if (savedPincode) {
-        const deliveryInfo = document.getElementById('deliveryInfo');
-        const deliveryMessage = document.getElementById('deliveryMessage');
-        const locationDisplay = document.getElementById('locationDisplay');
-        if (locationDisplay) {
-            locationDisplay.textContent = savedPincode;
-        }
-        const estimatedDays = savedPincode.startsWith('1') || savedPincode.startsWith('2') ? '2-3 days' : '3-5 days';
-        if (deliveryInfo && deliveryMessage) {
-            deliveryInfo.classList.remove('hidden');
-            deliveryMessage.textContent = estimatedDays;
-            deliveryMessage.classList.add('text-green-600');
-        }
-    }
-}
-
+// =============================================
+// LOCATION MODAL FUNCTIONS
+// =============================================
 function showLocationModal() {
     const locationModal = document.getElementById('locationModal');
     if (locationModal) {
@@ -362,7 +547,6 @@ function showLocationModal() {
         console.error('locationModal not found in DOM');
     }
 }
-
 function closeLocationModal() {
     const locationModal = document.getElementById('locationModal');
     if (locationModal) {
@@ -377,7 +561,6 @@ function closeLocationModal() {
         console.error('locationModal not found in DOM');
     }
 }
-
 function validatePincode() {
     const pincodeInput = document.getElementById('pincodeInput');
     const pincodeError = document.getElementById('pincodeError');
@@ -385,31 +568,31 @@ function validatePincode() {
     const deliveryInfo = document.getElementById('deliveryInfo');
     const deliveryMessage = document.getElementById('deliveryMessage');
     const locationDisplay = document.getElementById('locationDisplay');
-   
+  
     let currentLang;
     try {
         currentLang = localStorage.getItem('language') || 'en';
     } catch (e) {
         currentLang = 'en';
     }
-   
+  
     const pincodePattern = /^[1-9][0-9]{5}$/;
     if (!pincodeInput || !pincodeInput.value.trim()) {
         if (pincodeError) {
             pincodeError.textContent = translations[currentLang]['invalid_pincode'];
-            pincodeError.classList.remove('hidden');
+            pincodeError.classList.remove('auth-hidden');
         }
         console.warn('Pincode input empty');
     } else if (pincodePattern.test(pincodeInput.value.trim())) {
         const pincode = pincodeInput.value.trim();
         if (pincodeError) pincodeError.classList.add('hidden');
-       
+      
         try {
             localStorage.setItem('pincode', pincode);
         } catch (e) {
             console.warn('Cannot save to localStorage');
         }
-       
+      
         if (locationModal) {
             locationModal.classList.add('hidden');
             locationModal.style.display = 'none';
@@ -432,11 +615,11 @@ function validatePincode() {
         console.warn('Invalid pincode:', pincodeInput.value);
     }
 }
-
 function initLocationModal() {
     const validatePincodeBtn = document.getElementById('validatePincode');
     const closeLocationModalBtn = document.getElementById('closeLocationModal');
     const pincodeInput = document.getElementById('pincodeInput');
+   
     if (validatePincodeBtn) {
         validatePincodeBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -446,6 +629,7 @@ function initLocationModal() {
     } else {
         console.warn('validatePincode button not found');
     }
+   
     if (closeLocationModalBtn) {
         closeLocationModalBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -455,6 +639,7 @@ function initLocationModal() {
     } else {
         console.warn('closeLocationModal button not found');
     }
+   
     if (pincodeInput) {
         pincodeInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
@@ -467,6 +652,9 @@ function initLocationModal() {
     }
 }
 
+// =============================================
+// LANGUAGE MODAL FUNCTIONS
+// =============================================
 function showLanguageModal() {
     const languageModal = document.getElementById('languageModal');
     if (languageModal) {
@@ -477,7 +665,6 @@ function showLanguageModal() {
         console.error('languageModal not found in DOM');
     }
 }
-
 function closeLanguageModal() {
     const languageModal = document.getElementById('languageModal');
     if (languageModal) {
@@ -488,7 +675,6 @@ function closeLanguageModal() {
         console.error('languageModal not found in DOM');
     }
 }
-
 function selectLanguage(language) {
     const langCode = language === 'English' ? 'en' : language === 'Hindi' ? 'hi' : 'mr';
     console.log('Selected language:', language, 'langCode:', langCode);
@@ -505,7 +691,6 @@ function selectLanguage(language) {
     applyLanguage(langCode);
     closeLanguageModal();
 }
-
 function initLanguageSelection() {
     const languageButtons = document.querySelectorAll('.language-btn');
     console.log('Language buttons found:', languageButtons.length);
@@ -516,6 +701,7 @@ function initLanguageSelection() {
             selectLanguage(lang);
         });
     });
+   
     const closeLanguageModalBtn = document.getElementById('closeLanguageModal');
     if (closeLanguageModalBtn) {
         closeLanguageModalBtn.addEventListener('click', closeLanguageModal);
@@ -525,6 +711,9 @@ function initLanguageSelection() {
     }
 }
 
+// =============================================
+// FORGOT PASSWORD MODAL FUNCTIONS
+// =============================================
 function showForgetPasswordModal() {
     const forgetModal = document.getElementById('forgetPasswordModal');
     if (forgetModal) {
@@ -537,7 +726,6 @@ function showForgetPasswordModal() {
         console.error('forgetPasswordModal not found in DOM');
     }
 }
-
 function closeForgetPasswordModal() {
     const forgetModal = document.getElementById('forgetPasswordModal');
     if (forgetModal) {
@@ -551,11 +739,15 @@ function closeForgetPasswordModal() {
     }
 }
 
+// =============================================
+// MOBILE MENU FUNCTIONS
+// =============================================
 function initMobileMenu() {
     const mobileMenuToggle = document.getElementById('mobileMenuToggle');
     const mobileMenu = document.getElementById('mobileMenu');
     const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
     const closeMobileMenu = document.getElementById('closeMobileMenu');
+   
     if (mobileMenuToggle) {
         mobileMenuToggle.addEventListener('click', () => {
             mobileMenu.classList.add('mobile-open');
@@ -566,6 +758,7 @@ function initMobileMenu() {
     } else {
         console.warn('mobileMenuToggle not found');
     }
+   
     if (closeMobileMenu) {
         closeMobileMenu.addEventListener('click', () => {
             mobileMenu.classList.remove('mobile-open');
@@ -576,6 +769,7 @@ function initMobileMenu() {
     } else {
         console.warn('closeMobileMenu not found');
     }
+   
     if (mobileMenuOverlay) {
         mobileMenuOverlay.addEventListener('click', () => {
             mobileMenu.classList.remove('mobile-open');
@@ -584,35 +778,11 @@ function initMobileMenu() {
             console.log('Mobile menu closed via overlay');
         });
     }
-    const mobileToggles = document.querySelectorAll('.mobile-menu-toggle');
-    mobileToggles.forEach(toggle => {
-        toggle.addEventListener('click', (e) => {
-            e.preventDefault();
-            const submenu = toggle.nextElementSibling;
-            const icon = toggle.querySelector('i.fa-chevron-down');
-            const isActive = toggle.classList.contains('active');
-            document.querySelectorAll('.mobile-menu-toggle').forEach(otherToggle => {
-                if (otherToggle !== toggle) {
-                    otherToggle.classList.remove('active');
-                    const otherSubmenu = otherToggle.nextElementSibling;
-                    if (otherSubmenu) otherSubmenu.classList.add('hidden');
-                    const otherIcon = otherToggle.querySelector('i.fa-chevron-down');
-                    if (otherIcon) otherIcon.style.transform = 'rotate(0deg)';
-                }
-            });
-            if (isActive) {
-                toggle.classList.remove('active');
-                if (submenu) submenu.classList.add('hidden');
-                if (icon) icon.style.transform = 'rotate(0deg)';
-            } else {
-                toggle.classList.add('active');
-                if (submenu) submenu.classList.remove('hidden');
-                if (icon) icon.style.transform = 'rotate(180deg)';
-            }
-        });
-    });
 }
 
+// =============================================
+// PASSWORD TOGGLE FUNCTIONS
+// =============================================
 function initPasswordToggles() {
     // Login form password toggle
     const loginPasswordToggle = document.querySelector('#login-form .relative button');
@@ -624,10 +794,8 @@ function initPasswordToggles() {
         });
     }
 
-    // Signup form password toggles
+    // Signup form password toggle
     const signupPasswordInput = document.getElementById('signupPassword');
-    const confirmPasswordInput = document.getElementById('signupConfirmPassword');
-    
     if (signupPasswordInput) {
         const signupPasswordToggle = signupPasswordInput.parentElement.querySelector('button');
         if (signupPasswordToggle) {
@@ -637,7 +805,8 @@ function initPasswordToggles() {
             });
         }
     }
-    
+   
+   const confirmPasswordInput = document.getElementById('signupConfirmPassword');
     if (confirmPasswordInput) {
         const confirmPasswordToggle = confirmPasswordInput.parentElement.querySelector('button');
         if (confirmPasswordToggle) {
@@ -647,9 +816,22 @@ function initPasswordToggles() {
             });
         }
     }
-}
 
+        const forgetEmailInput = document.getElementById('forgetEmail');
+    if (forgetEmailInput && forgetEmailInput.parentElement.querySelector('button')) {
+        const forgetEmailToggle = forgetEmailInput.parentElement.querySelector('button');
+        if (forgetEmailToggle) {
+            forgetEmailToggle.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                // Assuming you want to toggle email visibility (though unusual)
+                // You might want to remove this if not needed for email
+            });
+        }
+    }
+}
 function togglePasswordVisibility(passwordInput, icon) {
+    if (!passwordInput || !icon) return;
+    
     if (passwordInput.type === 'password') {
         passwordInput.type = 'text';
         icon.classList.remove('fa-eye');
@@ -661,6 +843,9 @@ function togglePasswordVisibility(passwordInput, icon) {
     }
 }
 
+// =============================================
+// AUTH SLIDER (LOGIN/SIGNUP) FUNCTIONS
+// =============================================
 function initAuthSlider() {
     console.log('Initializing auth slider');
     const authSlider = document.getElementById('auth-slider');
@@ -672,31 +857,24 @@ function initAuthSlider() {
     const signupForm = document.getElementById('signup-form');
     const switchToSignup = document.getElementById('switch-to-signup');
     const switchToLogin = document.getElementById('switch-to-login');
-    const loginTrigger = document.getElementById('loginTrigger');
     const forgotPasswordLink = document.getElementById('forgotPasswordLink');
     const sendResetLink = document.getElementById('sendResetLink');
     const closeForgetModal = document.getElementById('closeForgetModal');
-    
+   
     if (!authSlider || !authOverlay) {
         console.warn('Auth slider or overlay not found in the DOM');
         return;
     }
-
-    // Initialize password toggles
     initPasswordToggles();
-
-    if (loginTrigger) {
-        loginTrigger.addEventListener('click', function(e) {
+    if (document.getElementById('loginTrigger')) {
+        document.getElementById('loginTrigger').addEventListener('click', function(e) {
             e.preventDefault();
             authSlider.classList.add('active');
             authOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
             console.log('Login slider opened');
         });
-    } else {
-        console.warn('loginTrigger not found');
     }
-
     if (closeAuth) {
         closeAuth.addEventListener('click', function() {
             authSlider.classList.remove('active');
@@ -704,10 +882,7 @@ function initAuthSlider() {
             document.body.style.overflow = 'auto';
             console.log('Auth slider closed');
         });
-    } else {
-        console.warn('close-auth not found');
     }
-
     if (authOverlay) {
         authOverlay.addEventListener('click', function(e) {
             if (e.target === authOverlay) {
@@ -718,7 +893,6 @@ function initAuthSlider() {
             }
         });
     }
-
     if (loginTab && signupTab && loginForm && signupForm) {
         loginTab.addEventListener('click', function() {
             loginTab.classList.add('active');
@@ -727,6 +901,7 @@ function initAuthSlider() {
             signupForm.classList.add('hidden');
             console.log('Switched to login tab');
         });
+       
         signupTab.addEventListener('click', function() {
             signupTab.classList.add('active');
             loginTab.classList.remove('active');
@@ -734,10 +909,7 @@ function initAuthSlider() {
             loginForm.classList.add('hidden');
             console.log('Switched to signup tab');
         });
-    } else {
-        console.warn('Auth tabs or forms not found');
     }
-
     if (switchToSignup) {
         switchToSignup.addEventListener('click', function(e) {
             e.preventDefault();
@@ -747,10 +919,7 @@ function initAuthSlider() {
             loginForm.classList.add('hidden');
             console.log('Switched to signup via link');
         });
-    } else {
-        console.warn('switch-to-signup not found');
     }
-
     if (switchToLogin) {
         switchToLogin.addEventListener('click', function(e) {
             e.preventDefault();
@@ -760,10 +929,7 @@ function initAuthSlider() {
             signupForm.classList.add('hidden');
             console.log('Switched to login via link');
         });
-    } else {
-        console.warn('switch-to-login not found');
     }
-
     if (forgotPasswordLink) {
         forgotPasswordLink.addEventListener('click', function(e) {
             e.preventDefault();
@@ -773,10 +939,7 @@ function initAuthSlider() {
             showForgetPasswordModal();
             console.log('Forgot password link clicked');
         });
-    } else {
-        console.warn('forgotPasswordLink not found');
     }
-
     if (sendResetLink) {
         sendResetLink.addEventListener('click', function(e) {
             e.preventDefault();
@@ -790,33 +953,26 @@ function initAuthSlider() {
                 alert('Please enter a valid email');
             }
         });
-    } else {
-        console.warn('sendResetLink not found');
     }
-
     if (closeForgetModal) {
         closeForgetModal.addEventListener('click', closeForgetPasswordModal);
         console.log('Forget password modal close button initialized');
-    } else {
-        console.warn('closeForgetModal not found');
     }
 
-    // === UPDATED SIGNUP VALIDATION ===
+    // =============================================
+    // SIGNUP WITH BACKEND API INTEGRATION
+    // =============================================
     const signupButton = document.querySelector('#signup-form .auth-btn');
     if (signupButton) {
-        signupButton.addEventListener('click', function(e) {
+        signupButton.addEventListener('click', async function(e) {
             e.preventDefault();
-
-            // Reset all error messages
             document.querySelectorAll('#signup-form small').forEach(el => el.classList.add('hidden'));
             let valid = true;
             let currentLang = 'en';
             try {
                 currentLang = localStorage.getItem('language') || 'en';
             } catch (e) {}
-
             const t = translations[currentLang];
-
             const firstName = document.getElementById('signupFirstName')?.value.trim();
             const lastName = document.getElementById('signupLastName')?.value.trim();
             const email = document.getElementById('signupEmail')?.value.trim();
@@ -827,13 +983,13 @@ function initAuthSlider() {
             const addressArea = document.getElementById('addressArea')?.value.trim();
             const addressCity = document.getElementById('addressCity')?.value.trim();
             const addressPincode = document.getElementById('addressPincode')?.value.trim();
+            const addressState = document.getElementById('addressState')?.value.trim() || 'Maharashtra';
+            const addressCountry = document.getElementById('addressCountry')?.value.trim() || 'India';
             const addressType = document.getElementById('addressType')?.value;
             const acceptTerms = document.getElementById('acceptTerms')?.checked;
-
-            const phonePattern = /^[6-9]\d{9}$/;  // Indian mobile
+            const phonePattern = /^[6-9]\d{9}$/;
             const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             const pincodePattern = /^[1-9][0-9]{5}$/;
-
             if (!firstName) { showError('firstNameError', t['first_name'] + ' is required'); valid = false; }
             if (!lastName) { showError('lastNameError', t['last_name'] + ' is required'); valid = false; }
             if (!email || !emailPattern.test(email)) { showError('emailError', 'Enter a valid email'); valid = false; }
@@ -846,17 +1002,52 @@ function initAuthSlider() {
             if (!addressPincode || !pincodePattern.test(addressPincode)) { showError('pincodeSignupError', t['invalid_pincode']); valid = false; }
             if (!addressType) { showError('addressTypeError', 'Please select address type'); valid = false; }
             if (!acceptTerms) { showError('termsError', 'You must accept the terms'); valid = false; }
-
             if (valid) {
-                console.log('Signup attempt for:', { firstName, lastName, email, phone });
-                alert('Signup successful for ' + firstName + ' ' + lastName);
-                closeAuth.click();
+                const userData = {
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    phone: phone,
+                    password: password,
+                    addressLandmark: addressLandmark,
+                    addressArea: addressArea,
+                    addressCity: addressCity,
+                    addressPincode: addressPincode,
+                    addressState: addressState,
+                    addressCountry: addressCountry,
+                    addressType: addressType
+                };
+                try {
+                    signupButton.disabled = true;
+                    signupButton.textContent = 'Creating Account...';
+                    const response = await createUserAPI(userData);
+                   
+                    console.log('User created successfully:', response);
+                    alert(`Account created successfully for ${firstName} ${lastName}!\nUser ID: ${response.userId}`);
+                   
+                    // FIXED: Safe form reset + close slider
+                    const form = document.getElementById('signup-form');
+                    if (form && typeof form.reset === 'function') form.reset();
+                    if (closeAuth) closeAuth.click();
+
+                    const loginData = { user: response, loginTime: Date.now() };
+                    sessionStorage.setItem('loggedInUser', JSON.stringify(loginData));
+                    sessionStorage.setItem('userId', response.userId);
+                    updateLoginTrigger(response);
+                } catch (error) {
+                    console.error('Signup error:', error);
+                    if (error.message.includes('Email already exists')) {
+                        showError('emailError', 'This email is already registered');
+                    } else {
+                        alert('Signup failed: ' + error.message);
+                    }
+                } finally {
+                    signupButton.disabled = false;
+                    signupButton.textContent = t['signup'];
+                }
             }
         });
-    } else {
-        console.warn('Signup button not found');
     }
-
     function showError(id, message) {
         const errorEl = document.getElementById(id);
         if (errorEl) {
@@ -865,28 +1056,128 @@ function initAuthSlider() {
         }
     }
 
-    // Login validation (unchanged)
-    const loginButton = document.querySelector('#login-form .auth-btn');
-    if (loginButton) {
-        loginButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            const phone = document.getElementById('loginPhone')?.value.trim();
-            const password = document.getElementById('loginPassword')?.value.trim();
-            const phonePattern = /^[0-9]{10}$/;
-            if (phone && phonePattern.test(phone) && password) {
-                console.log('Login attempt with phone:', phone);
-                alert('Login successful for phone: ' + phone);
-                closeAuth.click();
-            } else {
-                console.warn('Invalid login input:', { phone, password });
-                alert('Please enter a valid 10-digit phone number and password');
+    // =============================================
+    // LOGIN WITH BACKEND API INTEGRATION
+    // =============================================
+// Remove existing login button event listeners by cloning and replacing
+const loginButton = document.querySelector('#login-form .auth-btn');
+if (loginButton) {
+    const newLoginButton = loginButton.cloneNode(true);
+    loginButton.parentNode.replaceChild(newLoginButton, loginButton);
+    
+    // Now add the event listener to the new button
+    newLoginButton.addEventListener('click', async function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('Login button clicked - new listener');
+        
+        const phone = document.getElementById('loginPhone')?.value.trim();
+        const password = document.getElementById('loginPassword')?.value.trim();
+        const phonePattern = /^[6-9]\d{9}$/;
+       
+        if (phone && phonePattern.test(phone) && password) {
+            try {
+                // Store original state
+                const originalText = newLoginButton.textContent;
+                
+                // Update button state
+                newLoginButton.disabled = true;
+                newLoginButton.textContent = 'Logging in...';
+                newLoginButton.style.opacity = '0.7';
+                
+                // Use the updated login function
+                const result = await loginUser(phone, password);
+               
+                if (result.success) {
+                    console.log('Login successful:', result.user);
+                    alert(`Welcome back, ${result.user.firstName}!`);
+                   
+                    // Safe form reset
+                    const form = document.getElementById('login-form');
+                    if (form && typeof form.reset === 'function') form.reset();
+                    if (closeAuth) closeAuth.click();
+                    updateLoginTrigger(result.user);
+                } else {
+                    alert(result.message || 'Invalid phone number or password');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('Login failed. Please try again.');
+            } finally {
+                // Always re-enable the button
+                newLoginButton.disabled = false;
+                newLoginButton.style.opacity = '1';
+                let currentLang = 'en';
+                try {
+                    currentLang = localStorage.getItem('language') || 'en';
+                } catch (e) {}
+                newLoginButton.textContent = translations[currentLang]['login'];
             }
-        });
-    } else {
-        console.warn('Login button not found');
+        } else {
+            console.warn('Invalid login input:', { phone, password });
+            alert('Please enter a valid 10-digit phone number and password');
+        }
+    });
+}
+}
+
+// =============================================
+// APPLY LANGUAGE
+// =============================================
+function applyLanguage(lang) {
+    console.log('Applying language:', lang);
+    document.querySelectorAll('[data-i18n]').forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        if (translations[lang] && translations[lang][key]) {
+            element.textContent = translations[lang][key];
+        } else {
+            console.warn(`Translation missing for lang: ${lang}, key: ${key}`);
+        }
+    });
+   
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+        const key = element.getAttribute('data-i18n-placeholder');
+        if (translations[lang] && translations[lang][key]) {
+            element.placeholder = translations[lang][key];
+        } else {
+            console.warn(`Placeholder translation missing for lang: ${lang}, key: ${key}`);
+        }
+    });
+   
+    const titleElement = document.querySelector('title');
+    if (titleElement) {
+        const titleKey = titleElement.getAttribute('data-i18n');
+        if (translations[lang] && translations[lang][titleKey]) {
+            titleElement.textContent = translations[lang][titleKey];
+        }
+    }
+  
+    let savedPincode;
+    try {
+        savedPincode = localStorage.getItem('pincode');
+    } catch (e) {
+        savedPincode = null;
+    }
+  
+    if (savedPincode) {
+        const deliveryInfo = document.getElementById('deliveryInfo');
+        const deliveryMessage = document.getElementById('deliveryMessage');
+        const locationDisplay = document.getElementById('locationDisplay');
+        if (locationDisplay) {
+            locationDisplay.textContent = savedPincode;
+        }
+        const estimatedDays = savedPincode.startsWith('1') || savedPincode.startsWith('2') ? '2-3 days' : '3-5 days';
+        if (deliveryInfo && deliveryMessage) {
+            deliveryInfo.classList.remove('hidden');
+            deliveryMessage.textContent = estimatedDays;
+            deliveryMessage.classList.add('text-green-600');
+        }
     }
 }
 
+// =============================================
+// DOCUMENT READY
+// =============================================
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded');
     initializePage();

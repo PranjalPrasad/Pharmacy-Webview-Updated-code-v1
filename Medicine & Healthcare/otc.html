@@ -6,7 +6,6 @@
   <title>OTC Medicines – WhatsApp Order</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-      <link rel="stylesheet" href="/header.css">
   <script>
     tailwind.config = {
       theme: {
@@ -27,11 +26,50 @@
     .product-card:hover{transform:translateY(-5px);box-shadow:0 8px 16px rgba(0,0,0,.1);}
     .product-image{object-fit:contain;width:100%;height:160px;}
     .nav-sidebar{border:1px solid #36C2CE !important;}
+    .loading-spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top: 4px solid #36C2CE;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .error-message {
+      background-color: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #dc2626;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
   </style>
 </head>
 <body class="bg-white">
 
-<div id="header-placeholder"></div>
+<!-- Header -->
+<header class="bg-white shadow-sm">
+  <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+    <div class="flex items-center">
+      <h1 class="text-xl font-bold text-primary">Pharmacy Store</h1>
+    </div>
+    <nav class="hidden md:flex space-x-6">
+      <a href="#" class="text-gray-700 hover:text-primary">Home</a>
+      <a href="#" class="text-gray-700 hover:text-primary">Categories</a>
+      <a href="#" class="text-gray-700 hover:text-primary">Prescriptions</a>
+      <a href="#" class="text-gray-700 hover:text-primary">Contact</a>
+    </nav>
+    <div class="flex items-center space-x-4">
+      <button class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition">
+        Login
+      </button>
+    </div>
+  </div>
+</header>
 
 <!-- Hero -->
 <section class="w-full h-48 relative bg-center bg-cover"
@@ -50,41 +88,52 @@
       <!-- Sort -->
       <div class="flex justify-start mb-6">
         <select id="sortSelect" class="w-52 border border-gray-300 p-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary">
-          <option>Sort By: Relevance</option>
-          <option>Price: Low to High</option>
-          <option>Price: High to Low</option>
+          <option value="relevance">Sort By: Relevance</option>
+          <option value="price-low">Price: Low to High</option>
+          <option value="price-high">Price: High to Low</option>
         </select>
       </div>
 
       <!-- Categories -->
       <h2 class="text-lg font-bold mb-2">Categories</h2>
       <ul id="categoryList" class="space-y-2">
-        <li><a href="#" class="category-link font-medium">Pain Killers</a><span class="expand-toggle cursor-pointer ml-2 text-lg font-bold text-primary">+</span></li>
-        <li><a href="#" class="category-link font-medium">Infertility, OBS & Gynac</a><span class="expand-toggle cursor-pointer ml-2 text-lg font-bold text-primary">+</span></li>
-        <li><a href="#" class="category-link font-medium">Cough Syrup</a><span class="expand-toggle cursor-pointer ml-2 text-lg font-bold text-primary">+</span></li>
-        <li><a href="#" class="category-link font-medium">Antacids</a><span class="expand-toggle cursor-pointer ml-2 text-lg font-bold text-primary">+</span></li>
-        <li><a href="#" class="category-link font-medium">Wellness & Supplements</a><span class="expand-toggle cursor-pointer ml-2 text-lg font-bold text-primary">+</span></li>
-        <li><a href="#" class="category-link font-medium">Anti-Infective</a><span class="expand-toggle cursor-pointer ml-2 text-lg font-bold text-primary">+</span></li>
-        <li><a href="#" class="category-link font-medium">Laxative</a><span class="expand-toggle cursor-pointer ml-2 text-lg font-bold text-primary">+</span></li>
-        <li><a href="#" class="category-link font-medium">Flatulant</a><span class="expand-toggle cursor-pointer ml-2 text-lg font-bold text-primary">+</span></li>
+        <li><a href="#" class="category-link font-medium" data-category="Pain Killers">Pain Killers</a></li>
+        <li><a href="#" class="category-link font-medium" data-category="Infertility, OBS & Gynac">Infertility, OBS & Gynac</a></li>
+        <li><a href="#" class="category-link font-medium" data-category="Cough Syrup">Cough Syrup</a></li>
+        <li><a href="#" class="category-link font-medium" data-category="Antacids">Antacids</a></li>
+        <li><a href="#" class="category-link font-medium" data-category="Wellness & Supplements">Wellness & Supplements</a></li>
+        <li><a href="#" class="category-link font-medium" data-category="Anti-Infective">Anti-Infective</a></li>
+        <li><a href="#" class="category-link font-medium" data-category="Laxative">Laxative</a></li>
+        <li><a href="#" class="category-link font-medium" data-category="Flatulant">Flatulant</a></li>
       </ul>
 
       <!-- Brands -->
       <div class="mt-6">
-        <h2 class="text-lg font-bold mb-2">Brands <span class="expand-toggle cursor-pointer">+</span></h2>
-        <ul id="brandList" class="hidden space-y-2">
-          <li><label><input type="checkbox" class="brand-filter" value="BrandX"> BrandX</label></li>
-          <li><label><input type="checkbox" class="brand-filter" value="BrandY"> BrandY</label></li>
-          <li><label><input type="checkbox" class="brand-filter" value="BrandZ"> BrandZ</label></li>
-          <li><label><input type="checkbox" class="brand-filter" value="BrandW"> BrandW</label></li>
+        <h2 class="text-lg font-bold mb-2">Brands</h2>
+        <ul id="brandList" class="space-y-2">
+          <!-- Brands will be populated dynamically -->
         </ul>
       </div>
     </aside>
 
     <!-- Product Grid -->
     <section class="w-full md:w-5/6">
+      <div id="loadingIndicator" class="hidden">
+        <div class="loading-spinner"></div>
+        <p class="text-center text-gray-600 mt-2">Loading products...</p>
+      </div>
+      
+      <div id="errorMessage" class="hidden error-message">
+        <p><strong>Connection Issue:</strong> Cannot connect to the server. Showing sample products instead.</p>
+        <p class="text-sm mt-1">Make sure your Spring Boot server is running on localhost:8080</p>
+      </div>
+      
       <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        <!-- JS fills this -->
+        <!-- JS will fill this with products from API -->
+      </div>
+      
+      <div id="noProductsMessage" class="hidden text-center py-8">
+        <p class="text-gray-500 text-lg">No products found in this category.</p>
       </div>
     </section>
 
@@ -93,235 +142,383 @@
 
 <script>
 /* ==============================================================
-   1. DATA – all medicines (price, image, prescription flag)
+   API CONFIGURATION
    ============================================================== */
-const products = [
-  // ---------- Pain Killers ----------
-  {id:201,name:"Tab. Crocin 500",price:35,originalPrice:40,discount:"12% off",category:"Pain Killers",brand:"BrandX",image:"https://i.pinimg.com/736x/12/34/56/123456789abcdef0123456789abcdef.jpg",prescription:false},
-  {id:202,name:"Tab. Calpol 650",price:45,originalPrice:null,discount:"",category:"Pain Killers",brand:"BrandY",image:"https://i.pinimg.com/736x/23/45/67/23456789abcdef0123456789abcdef0.jpg",prescription:false},
-  {id:203,name:"Tab. Brutaflam MR 4",price:120,originalPrice:140,discount:"14% off",category:"Pain Killers",brand:"BrandZ",image:"https://i.pinimg.com/736x/34/56/78/3456789abcdef0123456789abcdef01.jpg",prescription:true},
-  {id:204,name:"Tab. Brutaflam Plus",price:150,originalPrice:170,discount:"12% off",category:"Pain Killers",brand:"BrandW",image:"https://i.pinimg.com/736x/45/67/89/456789abcdef0123456789abcdef012.jpg",prescription:true},
-  {id:205,name:"Tab. Dylomol MR",price:110,originalPrice:null,discount:"",category:"Pain Killers",brand:"BrandX",image:"https://i.pinimg.com/736x/56/78/90/567890abcdef0123456789abcdef0123.jpg",prescription:true},
-  {id:206,name:"Tab. Qpain SP",price:95,originalPrice:110,discount:"14% off",category:"Pain Killers",brand:"BrandY",image:"https://i.pinimg.com/736x/67/89/ab/6789abcdef0123456789abcdef01234.jpg",prescription:false},
-  {id:207,name:"Tab. Cyclopam",price:80,originalPrice:null,discount:"",category:"Pain Killers",brand:"BrandZ",image:"https://i.pinimg.com/736x/78/90/bc/7890bcdef0123456789abcdef012345.jpg",prescription:false},
-  {id:208,name:"Tab. Drotaz MF",price:130,originalPrice:150,discount:"13% off",category:"Pain Killers",brand:"BrandW",image:"https://i.pinimg.com/736x/89/ab/cd/89abcdef0123456789abcdef0123456.jpg",prescription:true},
-  {id:209,name:"Hydensa Ointment",price:90,originalPrice:null,discount:"",category:"Pain Killers",brand:"BrandX",image:"https://i.pinimg.com/736x/90/bc/de/90bcdef0123456789abcdef01234567.jpg",prescription:false},
-  {id:210,name:"Move / Volini Spray",price:180,originalPrice:210,discount:"14% off",category:"Pain Killers",brand:"BrandY",image:"https://i.pinimg.com/736x/ab/cd/ef/abcdef0123456789abcdef012345678.jpg",prescription:false},
-  {id:211,name:"Lax 2% Gel",price:75,originalPrice:null,discount:"",category:"Pain Killers",brand:"BrandZ",image:"https://i.pinimg.com/736x/bc/de/f0/bcdef0123456789abcdef0123456789.jpg",prescription:false},
-  {id:212,name:"Ibuprofen",price:55,originalPrice:65,discount:"15% off",category:"Pain Killers",brand:"BrandW",image:"https://i.pinimg.com/736x/cd/ef/01/cdef0123456789abcdef0123456789a.jpg",prescription:false},
-
-  // ---------- Infertility, OBS & Gynac ----------
-  {id:301,name:"Tab. Dydronext 10 mg",price:320,originalPrice:360,discount:"11% off",category:"Infertility, OBS & Gynac",brand:"BrandX",image:"https://i.pinimg.com/736x/de/f0/12/def0123456789abcdef0123456789ab.jpg",prescription:true},
-  {id:302,name:"Tab. Gestofit SR 200mg",price:280,originalPrice:null,discount:"",category:"Infertility, OBS & Gynac",brand:"BrandY",image:"https://i.pinimg.com/736x/ef/01/23/ef0123456789abcdef0123456789abc.jpg",prescription:true},
-  {id:303,name:"Tab. Doxtfolate",price:210,originalPrice:240,discount:"12% off",category:"Infertility, OBS & Gynac",brand:"BrandZ",image:"https://i.pinimg.com/736x/f0/12/34/f0123456789abcdef0123456789abcd.jpg",prescription:true},
-  {id:304,name:"Syp. Lactulose",price:150,originalPrice:null,discount:"",category:"Infertility, OBS & Gynac",brand:"BrandW",image:"https://i.pinimg.com/736x/12/34/56/123456789abcdef0123456789abcdef.jpg",prescription:false},
-  {id:305,name:"Tab. Estradiol 2mg",price:190,originalPrice:220,discount:"14% off",category:"Infertility, OBS & Gynac",brand:"BrandX",image:"https://i.pinimg.com/736x/23/45/67/23456789abcdef0123456789abcdef0.jpg",prescription:true},
-  {id:306,name:"Tab. Trafem MF",price:260,originalPrice:null,discount:"",category:"Infertility, OBS & Gynac",brand:"BrandY",image:"https://i.pinimg.com/736x/34/56/78/3456789abcdef0123456789abcdef01.jpg",prescription:true},
-  {id:307,name:"Cap. Vimosa",price:340,originalPrice:380,discount:"10% off",category:"Infertility, OBS & Gynac",brand:"BrandZ",image:"https://i.pinimg.com/736x/45/67/89/456789abcdef0123456789abcdef012.jpg",prescription:true},
-  {id:308,name:"Clotrimazol Ointment",price:70,originalPrice:null,discount:"",category:"Infertility, OBS & Gynac",brand:"BrandW",image:"https://i.pinimg.com/736x/56/78/90/567890abcdef0123456789abcdef0123.jpg",prescription:false},
-  {id:309,name:"Castro G 100",price:180,originalPrice:210,discount:"14% off",category:"Infertility, OBS & Gynac",brand:"BrandX",image:"https://i.pinimg.com/736x/67/89/ab/6789abcdef0123456789abcdef01234.jpg",prescription:true},
-  {id:310,name:"Eslevo",price:250,originalPrice:null,discount:"",category:"Infertility, OBS & Gynac",brand:"BrandY",image:"https://i.pinimg.com/736x/78/90/bc/7890bcdef0123456789abcdef012345.jpg",prescription:true},
-  {id:311,name:"Btc Fort",price:300,originalPrice:340,discount:"12% off",category:"Infertility, OBS & Gynac",brand:"BrandZ",image:"https://i.pinimg.com/736x/89/ab/cd/89abcdef0123456789abcdef0123456.jpg",prescription:true},
-  {id:312,name:"Btc Kit",price:420,originalPrice:480,discount:"12% off",category:"Infertility, OBS & Gynac",brand:"BrandW",image:"https://i.pinimg.com/736x/90/bc/de/90bcdef0123456789abcdef01234567.jpg",prescription:true},
-
-  // ---------- Cough Syrup ----------
-  {id:401,name:"Acekof",price:110,originalPrice:130,discount:"15% off",category:"Cough Syrup",brand:"BrandX",image:"https://i.pinimg.com/736x/ab/cd/ef/abcdef0123456789abcdef012345678.jpg",prescription:false},
-  {id:402,name:"Grillinctus",price:130,originalPrice:null,discount:"",category:"Cough Syrup",brand:"BrandY",image:"https://i.pinimg.com/736x/bc/de/f0/bcdef0123456789abcdef0123456789.jpg",prescription:false},
-
-  // ---------- Antacids ----------
-  {id:501,name:"Tab. Givpep-O",price:95,originalPrice:110,discount:"14% off",category:"Antacids",brand:"BrandZ",image:"https://i.pinimg.com/736x/cd/ef/01/cdef0123456789abcdef0123456789a.jpg",prescription:false},
-  {id:502,name:"Tab. Granisetron",price:220,originalPrice:250,discount:"12% off",category:"Antacids",brand:"BrandW",image:"https://i.pinimg.com/736x/de/f0/12/def0123456789abcdef0123456789ab.jpg",prescription:true},
-  {id:503,name:"Rabez DSR",price:180,originalPrice:null,discount:"",category:"Antacids",brand:"BrandX",image:"https://i.pinimg.com/736x/ef/01/23/ef0123456789abcdef0123456789abc.jpg",prescription:true},
-  {id:504,name:"Pan Raft",price:140,originalPrice:160,discount:"12% off",category:"Antacids",brand:"BrandY",image:"https://i.pinimg.com/736x/f0/12/34/f0123456789abcdef0123456789abcd.jpg",prescription:true},
-  {id:505,name:"Gelucil",price:85,originalPrice:null,discount:"",category:"Antacids",brand:"BrandZ",image:"https://i.pinimg.com/736x/12/34/56/123456789abcdef0123456789abcdef.jpg",prescription:false},
-
-  // ---------- Wellness & Supplements ----------
-  {id:601,name:"Cap. Alt Spur",price:290,originalPrice:330,discount:"12% off",category:"Wellness & Supplements",brand:"BrandW",image:"https://i.pinimg.com/736x/23/45/67/23456789abcdef0123456789abcdef0.jpg",prescription:false},
-  {id:602,name:"Tab. Mytozen",price:180,originalPrice:null,discount:"",category:"Wellness & Supplements",brand:"BrandX",image:"https://i.pinimg.com/736x/34/56/78/3456789abcdef0123456789abcdef01.jpg",prescription:false},
-  {id:603,name:"Cap. Gypsofer CR",price:260,originalPrice:300,discount:"13% off",category:"Wellness & Supplements",brand:"BrandY",image:"https://i.pinimg.com/736x/45/67/89/456789abcdef0123456789abcdef012.jpg",prescription:false},
-  {id:604,name:"Gypso Mom Protein Powder",price:450,originalPrice:520,discount:"13% off",category:"Wellness & Supplements",brand:"BrandZ",image:"https://i.pinimg.com/736x/56/78/90/567890abcdef0123456789abcdef0123.jpg",prescription:false},
-  {id:605,name:"PCOS Lite Protein Powder",price:480,originalPrice:null,discount:"",category:"Wellness & Supplements",brand:"BrandW",image:"https://i.pinimg.com/736x/67/89/ab/6789abcdef0123456789abcdef01234.jpg",prescription:false},
-  {id:606,name:"Tab. Coreva D3",price:120,originalPrice:140,discount:"14% off",category:"Wellness & Supplements",brand:"BrandX",image:"https://i.pinimg.com/736x/78/90/bc/7890bcdef0123456789abcdef012345.jpg",prescription:false},
-  {id:607,name:"Cap. Evion",price:95,originalPrice:null,discount:"",category:"Wellness & Supplements",brand:"BrandY",image:"https://i.pinimg.com/736x/89/ab/cd/89abcdef0123456789abcdef0123456.jpg",prescription:false},
-  {id:608,name:"Syrp. Menses OK",price:170,originalPrice:200,discount:"15% off",category:"Wellness & Supplements",brand:"BrandZ",image:"https://i.pinimg.com/736x/90/bc/de/90bcdef0123456789abcdef01234567.jpg",prescription:false},
-  {id:609,name:"Tab. Berifrm",price:210,originalPrice:null,discount:"",category:"Wellness & Supplements",brand:"BrandW",image:"https://i.pinimg.com/736x/ab/cd/ef/abcdef0123456789abcdef012345678.jpg",prescription:false},
-  {id:610,name:"Syrp. Calbisix",price:190,originalPrice:220,discount:"14% off",category:"Wellness & Supplements",brand:"BrandX",image:"https://i.pinimg.com/736x/bc/de/f0/bcdef0123456789abcdef0123456789.jpg",prescription:false},
-  {id:611,name:"Tab. Bactsol OTT",price:240,originalPrice:270,discount:"11% off",category:"Wellness & Supplements",brand:"BrandY",image:"https://i.pinimg.com/736x/cd/ef/01/cdef0123456789abcdef0123456789a.jpg",prescription:false},
-
-  // ---------- Anti-Infective ----------
-  {id:701,name:"Dettol",price:80,originalPrice:null,discount:"",category:"Anti-Infective",brand:"BrandZ",image:"https://i.pinimg.com/736x/de/f0/12/def0123456789abcdef0123456789ab.jpg",prescription:false},
-  {id:702,name:"Savlon",price:75,originalPrice:90,discount:"17% off",category:"Anti-Infective",brand:"BrandW",image:"https://i.pinimg.com/736x/ef/01/23/ef0123456789abcdef0123456789abc.jpg",prescription:false},
-  {id:703,name:"Betadin Ointment",price:110,originalPrice:null,discount:"",category:"Anti-Infective",brand:"BrandX",image:"https://i.pinimg.com/736x/f0/12/34/f0123456789abcdef0123456789abcd.jpg",prescription:false},
-  {id:704,name:"Placentrix Ointment",price:150,originalPrice:180,discount:"17% off",category:"Anti-Infective",brand:"BrandY",image:"https://i.pinimg.com/736x/12/34/56/123456789abcdef0123456789abcdef.jpg",prescription:false},
-  {id:705,name:"H2O2 Solution",price:45,originalPrice:null,discount:"",category:"Anti-Infective",brand:"BrandZ",image:"https://i.pinimg.com/736x/23/45/67/23456789abcdef0123456789abcdef0.jpg",prescription:false},
-  {id:706,name:"Betadin Solution",price:95,originalPrice:115,discount:"17% off",category:"Anti-Infective",brand:"BrandW",image:"https://i.pinimg.com/736x/34/56/78/3456789abcdef0123456789abcdef01.jpg",prescription:false},
-  {id:707,name:"Magself Powder",price:130,originalPrice:null,discount:"",category:"Anti-Infective",brand:"BrandX",image:"https://i.pinimg.com/736x/45/67/89/456789abcdef0123456789abcdef012.jpg",prescription:false},
-  {id:708,name:"Glycerin Solution",price:60,originalPrice:75,discount:"20% off",category:"Anti-Infective",brand:"BrandY",image:"https://i.pinimg.com/736x/56/78/90/567890abcdef0123456789abcdef0123.jpg",prescription:false},
-  {id:709,name:"Sanitizer",price:90,originalPrice:null,discount:"",category:"Anti-Infective",brand:"BrandZ",image:"https://i.pinimg.com/736x/67/89/ab/6789abcdef0123456789abcdef01234.jpg",prescription:false},
-  {id:710,name:"Spirit Solution",price:70,originalPrice:85,discount:"18% off",category:"Anti-Infective",brand:"BrandW",image:"https://i.pinimg.com/736x/78/90/bc/7890bcdef0123456789abcdef012345.jpg",prescription:false},
-
-  // ---------- Laxative ----------
-  {id:801,name:"Syrup Duphalac",price:210,originalPrice:240,discount:"12% off",category:"Laxative",brand:"BrandX",image:"https://i.pinimg.com/736x/89/ab/cd/89abcdef0123456789abcdef0123456.jpg",prescription:false},
-  {id:802,name:"PC Enema",price:180,originalPrice:null,discount:"",category:"Laxative",brand:"BrandY",image:"https://i.pinimg.com/736x/90/bc/de/90bcdef0123456789abcdef01234567.jpg",prescription:false},
-  {id:803,name:"Dulcolax Suppository",price:150,originalPrice:175,discount:"14% off",category:"Laxative",brand:"BrandZ",image:"https://i.pinimg.com/736x/ab/cd/ef/abcdef0123456789abcdef012345678.jpg",prescription:false},
-
-  // ---------- Flatulant ----------
-  {id:901,name:"Flatuna Tab.",price:85,originalPrice:100,discount:"15% off",category:"Flatulant",brand:"BrandW",image:"https://i.pinimg.com/736x/bc/de/f0/bcdef0123456789abcdef0123456789.jpg",prescription:false}
-];
-/* ==============================================================
-   2. DOM & State
-   ============================================================== */
-const productGrid   = document.getElementById('productGrid');
-const categoryList  = document.getElementById('categoryList');
-const brandList     = document.getElementById('brandList');
-const brandToggle   = brandList?.previousElementSibling?.querySelector('span');
-const brandFilters  = document.querySelectorAll('.brand-filter');
-const sortSelect    = document.getElementById('sortSelect');
-
-let activeCategory = null;   // null = all
-let activeSort     = null;
+const API_BASE_URL = 'http://localhost:8080/api/products';
 
 /* ==============================================================
-   3. Helpers
+   DOM & State
    ============================================================== */
-function escapeHtml(s){return s?.toString().replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
+const productGrid = document.getElementById('productGrid');
+const categoryList = document.getElementById('categoryList');
+const brandList = document.getElementById('brandList');
+const sortSelect = document.getElementById('sortSelect');
+const loadingIndicator = document.getElementById('loadingIndicator');
+const noProductsMessage = document.getElementById('noProductsMessage');
+const errorMessage = document.getElementById('errorMessage');
+
+let products = [];
+let activeCategory = null;
+let activeSort = 'relevance';
+let brands = new Set();
 
 /* ==============================================================
-   4. Card creation – WhatsApp button ONLY (NO CARD CLICK)
+   Helper Functions
    ============================================================== */
-function createProductCard(p){
+function escapeHtml(s) {
+  if (!s) return '';
+  return s.toString().replace(/[&<>"']/g, m => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+  }[m]));
+}
+
+function showLoading() {
+  loadingIndicator.classList.remove('hidden');
+  productGrid.classList.add('hidden');
+  noProductsMessage.classList.add('hidden');
+  errorMessage.classList.add('hidden');
+}
+
+function hideLoading() {
+  loadingIndicator.classList.add('hidden');
+}
+
+function showNoProducts() {
+  noProductsMessage.classList.remove('hidden');
+  productGrid.classList.add('hidden');
+}
+
+function hideNoProducts() {
+  noProductsMessage.classList.add('hidden');
+}
+
+function showError() {
+  errorMessage.classList.remove('hidden');
+  productGrid.classList.remove('hidden');
+}
+
+function hideError() {
+  errorMessage.classList.add('hidden');
+}
+
+/* ==============================================================
+   Sample OTC Products Data (Fallback)
+   ============================================================== */
+function getSampleOTCProducts() {
+  return [
+    {
+      productId: 1,
+      productName: "Tab. Crocin 500",
+      productPrice: 35,
+      originalPrice: 40,
+      discount: "12% off",
+      productCategory: "Pain Killers",
+      brand: "Crocin",
+      productMainImage: "https://via.placeholder.com/300x300/36C2CE/FFFFFF?text=Crocin+500",
+      prescriptionRequired: false
+    },
+    {
+      productId: 2,
+      productName: "Tab. Calpol 650",
+      productPrice: 45,
+      originalPrice: null,
+      discount: "",
+      productCategory: "Pain Killers",
+      brand: "Calpol",
+      productMainImage: "https://via.placeholder.com/300x300/0ea5e9/FFFFFF?text=Calpol+650",
+      prescriptionRequired: false
+    },
+    {
+      productId: 3,
+      productName: "Acekof Syrup",
+      productPrice: 110,
+      originalPrice: 130,
+      discount: "15% off",
+      productCategory: "Cough Syrup",
+      brand: "Acekof",
+      productMainImage: "https://via.placeholder.com/300x300/10b981/FFFFFF?text=Acekof+Syrup",
+      prescriptionRequired: false
+    },
+    {
+      productId: 4,
+      productName: "Tab. Digene",
+      productPrice: 85,
+      originalPrice: 100,
+      discount: "15% off",
+      productCategory: "Antacids",
+      brand: "Digene",
+      productMainImage: "https://via.placeholder.com/300x300/8b5cf6/FFFFFF?text=Digene",
+      prescriptionRequired: false
+    },
+    {
+      productId: 5,
+      productName: "Volini Spray",
+      productPrice: 180,
+      originalPrice: 210,
+      discount: "14% off",
+      productCategory: "Pain Killers",
+      brand: "Volini",
+      productMainImage: "https://via.placeholder.com/300x300/f59e0b/FFFFFF?text=Volini+Spray",
+      prescriptionRequired: false
+    },
+    {
+      productId: 6,
+      productName: "Dettol Antiseptic",
+      productPrice: 80,
+      originalPrice: null,
+      discount: "",
+      productCategory: "Anti-Infective",
+      brand: "Dettol",
+      productMainImage: "https://via.placeholder.com/300x300/ef4444/FFFFFF?text=Dettol",
+      prescriptionRequired: false
+    },
+    {
+      productId: 7,
+      productName: "Evion Capsules",
+      productPrice: 95,
+      originalPrice: null,
+      discount: "",
+      productCategory: "Wellness & Supplements",
+      brand: "Evion",
+      productMainImage: "https://via.placeholder.com/300x300/84cc16/FFFFFF?text=Evion+Capsules",
+      prescriptionRequired: false
+    },
+    {
+      productId: 8,
+      productName: "Duphalac Syrup",
+      productPrice: 210,
+      originalPrice: 240,
+      discount: "12% off",
+      productCategory: "Laxative",
+      brand: "Duphalac",
+      productMainImage: "https://via.placeholder.com/300x300/06b6d4/FFFFFF?text=Duphalac+Syrup",
+      prescriptionRequired: false
+    }
+  ];
+}
+
+/* ==============================================================
+   API Functions
+   ============================================================== */
+async function fetchProductsBySubCategory(subCategory) {
+  try {
+    showLoading();
+    console.log('Attempting to fetch products from:', `${API_BASE_URL}/get-category-by-subpath/${encodeURIComponent(subCategory)}`);
+    
+    const response = await fetch(`${API_BASE_URL}/get-category-by-subpath/${encodeURIComponent(subCategory)}`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log('Successfully fetched products from API:', data);
+    hideError();
+    return data;
+    
+  } catch (error) {
+    console.error('Error fetching products from API:', error);
+    console.log('Falling back to sample data');
+    showError();
+    return getSampleOTCProducts();
+  } finally {
+    hideLoading();
+  }
+}
+
+/* ==============================================================
+   Product Card Creation
+   ============================================================== */
+function createProductCard(product) {
   const div = document.createElement('div');
   div.className = 'product-card bg-white p-4 shadow rounded-lg flex flex-col justify-between relative';
 
-  const rxBadge = p.prescriptionRequired ? `<div class="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">Rx</div>` : '';
+  const rxBadge = product.prescriptionRequired ? 
+    `<div class="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">Rx</div>` : '';
 
-  const waMsg = encodeURIComponent(`Hi, I want to buy:\n*${p.name}* – ₹${p.price}\n${p.prescriptionRequired?'(Prescription required)':''}`);
+  const waMsg = encodeURIComponent(
+    `Hi, I want to buy:\n*${product.productName}* – ₹${product.productPrice}\n${product.prescriptionRequired ? '(Prescription required)' : ''}`
+  );
 
   div.innerHTML = `
     ${rxBadge}
-    <img src="${p.image}" alt="${escapeHtml(p.name)}" class="product-image w-full h-32 rounded-lg mb-3">
-    <p class="text-sm text-gray-600 font-medium">${escapeHtml(p.name)}</p>
-    <p class="text-xs text-gray-500">${escapeHtml(p.brand)}</p>
-    ${p.prescriptionRequired?'<p class="text-red-600 text-xs mt-1 font-semibold">Prescription needed</p>':''}
-    <p class="text-green-600 font-bold mt-2">₹${p.price.toFixed(2)}
-      ${p.originalPrice?`<span class="text-gray-500 line-through text-sm">₹${p.originalPrice.toFixed(2)}</span> <span class="text-green-600 text-sm">${escapeHtml(p.discount)}</span>`:''}
+    <img src="${product.productMainImage}" alt="${escapeHtml(product.productName)}" 
+         class="product-image w-full h-32 rounded-lg mb-3"
+         onerror="this.src='https://via.placeholder.com/300x300/cccccc/666666?text=Product+Image'">
+    <p class="text-sm text-gray-600 font-medium">${escapeHtml(product.productName)}</p>
+    <p class="text-xs text-gray-500">${escapeHtml(product.brand)}</p>
+    ${product.prescriptionRequired ? '<p class="text-red-600 text-xs mt-1 font-semibold">Prescription needed</p>' : ''}
+    <p class="text-green-600 font-bold mt-2">₹${product.productPrice.toFixed(2)}
+      ${product.originalPrice ? 
+        `<span class="text-gray-500 line-through text-sm">₹${product.originalPrice.toFixed(2)}</span> 
+         <span class="text-green-600 text-sm">${escapeHtml(product.discount)}</span>` : ''}
     </p>
     <button class="mt-3 w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg transition flex items-center justify-center gap-2 whatsapp-btn"
-            data-product='${escapeHtml(JSON.stringify(p))}'>
-      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.297-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.262c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297C11.416.882 3.007 9.292 3.007 18.752c0 2.883.783 5.57 2.14 7.866l-2.24 6.48 6.62-2.18a11.95 11.95 0 005.561 1.39c6.614 0 12-5.387 12-12 0-3.204-1.238-6.217-3.486-8.486-2.248-2.27-5.26-3.524-8.486-3.524z"/></svg>
+            data-product='${escapeHtml(JSON.stringify(product))}'>
+      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.297-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.262c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297C11.416.882 3.007 9.292 3.007 18.752c0 2.883.783 5.57 2.14 7.866l-2.24 6.48 6.62-2.18a11.95 11.95 0 005.561 1.39c6.614 0 12-5.387 12-12 0-3.204-1.238-6.217-3.486-8.486-2.248-2.27-5.26-3.524-8.486-3.524z"/>
+      </svg>
       Order on WhatsApp
     </button>
   `;
-
-  // NO CARD CLICK → REMOVED ENTIRELY
-  // Only WhatsApp button works via event delegation below
 
   return div;
 }
 
 /* ==============================================================
-   5. Rendering
+   Rendering Functions
    ============================================================== */
-function render(list){ 
-  productGrid.innerHTML=''; 
-  list.forEach(p => productGrid.appendChild(createProductCard(p))); 
-}
-render(products);
-
-/* ==============================================================
-   6. Filters & Sort
-   ============================================================== */
-categoryList?.addEventListener('click', e=>{
-  if(e.target.classList.contains('expand-toggle')){
-    const li = e.target.parentElement;
-    const sub = li.querySelector('.subcategory');
-    if(sub) sub.classList.toggle('hidden');
-    else{
-      const cat = li.querySelector('.category-link')?.textContent.trim();
-      const items = products.filter(p=>p.category===cat).map(p=>p.name);
-      if(items.length){
-        const ul=document.createElement('ul'); ul.className='subcategory hidden ml-4 space-y-1';
-        items.forEach(i=>{ 
-          const li2=document.createElement('li');
-          li2.innerHTML=`<a href="#" class="subcategory-link text-sm text-gray-600 hover:text-primary">${escapeHtml(i)}</a>`; 
-          ul.appendChild(li2);
-        });
-        li.appendChild(ul); 
-        ul.classList.toggle('hidden');
-      }
-    }
-    e.target.textContent = e.target.textContent==='+'?'-':'+';
+function renderProducts(productList) {
+  productGrid.innerHTML = '';
+  
+  if (productList.length === 0) {
+    showNoProducts();
     return;
   }
-  if(e.target.classList.contains('category-link')||e.target.classList.contains('subcategory-link')){
-    e.preventDefault();
-    const txt = e.target.textContent.trim();
-    const filtered = e.target.classList.contains('subcategory-link')
-      ? products.filter(p=>p.name===txt)
-      : products.filter(p=>p.category===txt);
-    activeCategory = txt;
-    applyFilters(filtered);
+  
+  hideNoProducts();
+  
+  productList.forEach(product => {
+    productGrid.appendChild(createProductCard(product));
+  });
+}
+
+function updateBrandFilters() {
+  brandList.innerHTML = '';
+  
+  if (brands.size === 0) {
+    const noBrandsItem = document.createElement('li');
+    noBrandsItem.textContent = 'No brands available';
+    noBrandsItem.className = 'text-gray-500 text-sm';
+    brandList.appendChild(noBrandsItem);
+    return;
   }
-});
-
-brandToggle?.addEventListener('click',()=>{
-  brandList.classList.toggle('hidden');
-  brandToggle.textContent = brandToggle.textContent==='+'?'-':'+';
-});
-brandFilters.forEach(f=>f.addEventListener('change',()=>applyFilters(products)));
-sortSelect?.addEventListener('change',()=>{activeSort=sortSelect.value;applyFilters(products);});
-
-function applyFilters(start){
-  let list = start ? [...start] : [...products];
-
-  // brand filter
-  const sel = Array.from(brandFilters).filter(f=>f.checked).map(f=>f.value);
-  if(sel.length) list = list.filter(p=>sel.includes(p.brand));
-
-  // sort
-  if(activeSort==='Price: Low to High') list.sort((a,b)=>a.price-b.price);
-  else if(activeSort==='Price: High to Low') list.sort((a,b)=>b.price-a.price);
-
-  render(list);
+  
+  brands.forEach(brand => {
+    const listItem = document.createElement('li');
+    listItem.innerHTML = `
+      <label class="flex items-center space-x-2 cursor-pointer">
+        <input type="checkbox" class="brand-filter" value="${escapeHtml(brand)}">
+        <span>${escapeHtml(brand)}</span>
+      </label>
+    `;
+    brandList.appendChild(listItem);
+  });
+  
+  // Add event listeners to new brand checkboxes
+  document.querySelectorAll('.brand-filter').forEach(checkbox => {
+    checkbox.addEventListener('change', applyFilters);
+  });
 }
 
 /* ==============================================================
-   7. WhatsApp button delegation (ONLY CLICKABLE PART)
+   Filtering and Sorting
    ============================================================== */
-document.body.addEventListener('click', e=>{
-  const btn = e.target.closest('.whatsapp-btn');
-  if(!btn) return;
-  e.stopPropagation(); // Prevent any parent click
-  const raw = btn.getAttribute('data-product');
-  const prod = JSON.parse(unescapeHtml(raw));
-  const phone = '919876543210'; // <<<--- CHANGE TO YOUR WHATSAPP NUMBER
-  const msg  = encodeURIComponent(`Hi, I want to buy:\n*${prod.name}* – ₹${prod.price}\n${prod.prescriptionRequired?'(Prescription required)':''}`);
-  window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
-});
-
-function unescapeHtml(s){
-  const div=document.createElement('div');
-  div.innerHTML=s;
-  return div.textContent;
+function applyFilters() {
+  let filteredProducts = [...products];
+  
+  // Apply category filter
+  if (activeCategory) {
+    filteredProducts = filteredProducts.filter(p => p.productCategory === activeCategory);
+  }
+  
+  // Apply brand filters
+  const selectedBrands = Array.from(document.querySelectorAll('.brand-filter:checked'))
+    .map(cb => cb.value);
+  
+  if (selectedBrands.length > 0) {
+    filteredProducts = filteredProducts.filter(p => selectedBrands.includes(p.brand));
+  }
+  
+  // Apply sorting
+  if (activeSort === 'price-low') {
+    filteredProducts.sort((a, b) => a.productPrice - b.productPrice);
+  } else if (activeSort === 'price-high') {
+    filteredProducts.sort((a, b) => b.productPrice - a.productPrice);
+  }
+  
+  renderProducts(filteredProducts);
 }
+
+/* ==============================================================
+   Event Listeners
+   ============================================================== */
+function setupEventListeners() {
+  // Category selection
+  categoryList.addEventListener('click', (e) => {
+    if (e.target.classList.contains('category-link')) {
+      e.preventDefault();
+      const category = e.target.getAttribute('data-category');
+      
+      // Update active category
+      activeCategory = category;
+      
+      // Update UI to show active category
+      document.querySelectorAll('.category-link').forEach(link => {
+        link.classList.remove('text-primary', 'font-bold');
+      });
+      e.target.classList.add('text-primary', 'font-bold');
+      
+      applyFilters();
+    }
+  });
+  
+  // Sort selection
+  sortSelect.addEventListener('change', (e) => {
+    activeSort = e.target.value;
+    applyFilters();
+  });
+  
+  // WhatsApp button delegation
+  document.body.addEventListener('click', (e) => {
+    const btn = e.target.closest('.whatsapp-btn');
+    if (!btn) return;
+    
+    e.stopPropagation();
+    const raw = btn.getAttribute('data-product');
+    const product = JSON.parse(raw);
+    const phone = '919876543210'; // Replace with your WhatsApp number
+    const msg = encodeURIComponent(
+      `Hi, I want to buy:\n*${product.productName}* – ₹${product.productPrice}\n${product.prescriptionRequired ? '(Prescription required)' : ''}`
+    );
+    window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+  });
+}
+
+/* ==============================================================
+   Initialization
+   ============================================================== */
+async function initializePage() {
+  // Setup event listeners first
+  setupEventListeners();
+  
+  // Fetch OTC products from API
+  console.log('Initializing page, fetching OTC products...');
+  products = await fetchProductsBySubCategory('otc');
+  
+  // Extract unique brands from products
+  products.forEach(product => {
+    if (product.brand) {
+      brands.add(product.brand);
+    }
+  });
+  
+  // Update brand filters
+  updateBrandFilters();
+  
+  // Render all products initially
+  renderProducts(products);
+}
+
+// Initialize the page when DOM is loaded
+document.addEventListener('DOMContentLoaded', initializePage);
 </script>
-<script>
-    // Dynamic Header Loader (root-relative path works from any subfolder)
-    window.addEventListener('DOMContentLoaded', function() {
-        fetch('/header.html')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('header-placeholder').innerHTML = data;
-                // Re-run any init functions (e.g., for modals, i18n)
-                if (typeof initializePage === 'function') initializePage();
-                if (typeof initializeHeader === 'function') initializeHeader(); // If you have header-specific init
-            })
-            .catch(error => {
-                console.error('Error loading header:', error);
-            });
-    });
-</script>
-  <script src="/header.js"></script>
 
 </body>
 </html>
